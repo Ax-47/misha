@@ -18,6 +18,12 @@ type Config struct {
 		Database   string   `yaml:"database"`
 		Collection []string `yaml:"collection"`
 	}
+	Lavalink struct {
+		Name     string `yaml:"name"`
+		Address  string `yaml:"address"`
+		Password string `yaml:"password"`
+		Https    bool   `yaml:"https"`
+	}
 }
 
 func Config_init() (*Config, error) {

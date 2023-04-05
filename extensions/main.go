@@ -3,6 +3,8 @@ package extensions
 import (
 	d "misha/database"
 	l "misha/languages"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type Ex struct {
@@ -10,10 +12,18 @@ type Ex struct {
 	DB        d.Database
 }
 
-func (c *Ex) Init(url, database string, colls []string) error {
+func (c *Ex) Init(url, database string, colls []string, s *discordgo.Session, name, address, password string, https bool) error {
 	var err error
 	c.DB = d.Database{}
 	err = c.DB.Init(url, database, colls)
+	if err != nil {
+		return err
+	}
+
+	if err != nil {
+		return err
+	}
+
 	if err != nil {
 		return err
 	}
