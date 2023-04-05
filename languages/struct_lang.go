@@ -8,6 +8,14 @@ type Lang struct {
 				Description string `json:"description"`
 				Image       string `json:"Image"`
 			}
+			Setup struct {
+				Title       string `json:"title"`
+				Description string `json:"description"`
+			}
+			Music struct {
+				Title       string `json:"title"`
+				Description string `json:"description"`
+			}
 		}
 		Components struct {
 			Placeholder string `json:"placeholder"`
@@ -18,14 +26,8 @@ type Lang struct {
 				Filter string `json:"filter"`
 			}
 		}
+		Error struct {
+			SelecterIsntAuthor string `json:"selecter_isnt_author"`
+		}
 	}
-}
-
-type Music struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
-}
-type Setup struct {
-	Title       string `json:"title"`
-	Description string `json:"description"`
 }

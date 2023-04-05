@@ -14,6 +14,9 @@ var (
 	}
 )
 
+type L struct {
+}
+
 func Lang_init() (map[string]Lang, error) {
 	languages := make(map[string]Lang)
 	for language, file := range files {

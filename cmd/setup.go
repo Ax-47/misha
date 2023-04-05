@@ -7,9 +7,9 @@ import (
 )
 
 func (c *Cmd) Help(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	setup.Help(c.languages, s, i)
+	setup.Help(c.Ex, s, i)
 }
 
 func (c *Cmd) Help_Component(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	setup.Help_Component(c.languages, s, i)
+	setup.Help_Component(c.Ex, s, i)
 }

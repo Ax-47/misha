@@ -2,16 +2,17 @@ package cmd
 
 import (
 	"log"
-	l "misha/languages"
+	"misha/extensions"
 )
 
 type Cmd struct {
-	languages map[string]l.Lang
+	Ex *extensions.Ex
 }
 
 func (c *Cmd) Init() {
 	var err error
-	c.languages, err = l.Lang_init()
+	c.Ex = &extensions.Ex{}
+	c.Ex.Init()
 	if err != nil {
 		log.Fatalf("Invalid Language Handlers: %v", err)
 	}

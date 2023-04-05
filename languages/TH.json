@@ -5,6 +5,14 @@
                 "title": "Ax47 | Help",
                 "description": "จ้า! mishaมาแล้วสหาย \nอยากรู้คำสั่งอะไรเลือกด้านล่างเลยจ้า donateให้เจ้าของbotได้ที่ [tipme](https://tipme.in.th/ax-47) \nปล.เจ้าของbotไปเซ็นร้านค้าเป็นร้อยแล้วววววว",
                 "image": "https://cdn.discordapp.com/attachments/1092016880136503296/1092777250920861726/no_money.png"
+            },
+            "setup": {
+                "title": "Ax47 | Setup",
+                "description": "คำสั่งนี้ใช้แค่adminเท่านั้น"
+            },
+            "music": {
+                "title": "Ax47 | Music",
+                "description": "Djจะใช้ได้คำสั่งโดยไม่ต้องvote"
             }
         },
         "components": {
@@ -15,6 +23,9 @@
                 "music": "คำสั่งเพลง",
                 "filter": "filter ส่วนขยานคำสั่งเพลง"
             }
+        },
+        "error": {
+            "selecter_isnt_author": "`\\help` ใช้ของตัวเองสิ"
         }
     }
 }
