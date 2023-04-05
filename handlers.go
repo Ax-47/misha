@@ -23,7 +23,7 @@ var (
 
 func ComponentsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"select": c.Help_Component,
+		"select": c.HelpComponent,
 	}
 }
 func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
