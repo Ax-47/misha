@@ -14,7 +14,9 @@ type Config struct {
 		Rmcmd bool   `yaml:"rmcmd"`
 	}
 	Database struct {
-		Url string `yaml:"url"`
+		Url        string   `yaml:"url"`
+		Database   string   `yaml:"database"`
+		Collection []string `yaml:"collection"`
 	}
 }
 

@@ -88,6 +88,7 @@ func Help(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 					Components: create_Components(c, i.Locale.String()),
 				},
 			}}})
+
 }
 
 func Help_Component(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {

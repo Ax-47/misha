@@ -1,17 +1,23 @@
 package extensions
 
 import (
+	d "misha/database"
 	l "misha/languages"
 )
 
 type Ex struct {
-	Languages map[string]l.Lang
+	languages map[string]l.Lang
+	DB        d.Database
 }
 
-func (c *Ex) Init() error {
+func (c *Ex) Init(url, database string, colls []string) error {
 	var err error
-	c.Languages, err = l.Lang_init()
-
+	c.DB = d.Database{}
+	err = c.DB.Init(url, database, colls)
+	if err != nil {
+		return err
+	}
+	c.languages, err = l.Lang_init()
 	return err
 
 }
@@ -22,5 +28,5 @@ func (c *Ex) Lang(lang string) l.Lang {
 		lang = "English, US"
 	}
 
-	return c.Languages[lang]
+	return c.languages[lang]
 }

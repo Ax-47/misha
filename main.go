@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"misha/cmd"
 	"os"
@@ -16,7 +15,6 @@ var (
 	c   cmd.Cmd
 )
 
-func init() { flag.Parse() }
 func init() {
 	var err error
 	con, err = Config_init()
@@ -34,27 +32,21 @@ func init() {
 }
 
 func init() {
-	c.Init()
+	c.Init(con.Database.Url, con.Database.Database, con.Database.Collection)
 
-	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		switch i.Type {
-		case discordgo.InteractionApplicationCommand:
-			if h, ok := CommandsHandlers_init(c)[i.ApplicationCommandData().Name]; ok {
-				h(s, i)
-			}
-		case discordgo.InteractionMessageComponent:
+	s.AddHandler(CommandsHandler)
+}
+func init() {
+	c.Init(con.Database.Url, con.Database.Database, con.Database.Collection)
 
-			if h, ok := ComponentsHandlers_init(c)[i.MessageComponentData().CustomID]; ok {
-				h(s, i)
-			}
-		}
-	})
+	s.AddHandler(EventHandler)
 }
 
 func main() {
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
+
 	err := s.Open()
 	if err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
