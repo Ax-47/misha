@@ -98,18 +98,31 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 		})
 	}
 
-	var tracks string
-	for i, track := range queue.Tracks {
-		tracks += fmt.Sprintf("%d. [`%s`](<%s>)\n", i+1, track.Info.Title, *track.Info.URI)
-		if i >= 10 {
-			break
-		}
-	}
-
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Queue `%s`:\n%s", queue.Type, tracks),
+			Embeds: []*discordgo.MessageEmbed{embedQueue(1, queue)},
+			Components: []discordgo.MessageComponent{
+				discordgo.ActionsRow{
+					Components: []discordgo.MessageComponent{
+						discordgo.Button{
+							Style:    discordgo.SuccessButton,
+							Emoji:    discordgo.ComponentEmoji{Name: "◀️"},
+							CustomID: "re",
+						},
+						discordgo.Button{
+							Style:    discordgo.SuccessButton,
+							Emoji:    discordgo.ComponentEmoji{Name: "▶️"},
+							CustomID: "next",
+						},
+						discordgo.Button{
+							Style:    discordgo.DangerButton,
+							Emoji:    discordgo.ComponentEmoji{Name: "🗙"},
+							CustomID: "close",
+						},
+					},
+				},
+			},
 		},
 	})
 }

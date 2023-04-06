@@ -2,6 +2,7 @@ package music
 
 import (
 	"fmt"
+	"misha/lava"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/lavalink"
@@ -68,5 +69,30 @@ func embedError(err error) *discordgo.MessageEmbed {
 		Color:       0xff4700,
 		Title:       "have error",
 		Description: err.Error(),
+	}
+}
+
+func embedQueue(index int, queue *lava.Queue) *discordgo.MessageEmbed {
+	var tracks string
+	lengthtracks := len(queue.Tracks)
+	for i, track := range queue.Tracks {
+		if i > 9 {
+			break
+		}
+		tracks += fmt.Sprintf("%d : [`%s`](<%s>)\n", i+1, track.Info.Title, *track.Info.URI)
+
+	}
+	pages := lengthtracks / 10
+	if lengthtracks%10 != 0 {
+		pages += 1
+	}
+
+	return &discordgo.MessageEmbed{
+		Color:       0xff4700,
+		Title:       fmt.Sprintf("%d Track in Queue", lengthtracks),
+		Description: tracks,
+		Footer: &discordgo.MessageEmbedFooter{
+			Text: fmt.Sprintf("page %d/%d ", index, pages),
+		},
 	}
 }
