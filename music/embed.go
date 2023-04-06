@@ -12,17 +12,17 @@ func embedPlayFoundTrack(track lavalink.Track) *discordgo.MessageEmbed {
 		Color: 0xff4700,
 		Title: "🎵 added track",
 		Fields: []*discordgo.MessageEmbedField{
-			&discordgo.MessageEmbedField{
+			{
 				Name:   "song",
 				Value:  fmt.Sprintf("[%s](%s)", track.Info.Title, *track.Info.URI),
 				Inline: false,
 			},
-			&discordgo.MessageEmbedField{
+			{
 				Name:   "author",
 				Value:  track.Info.Author,
 				Inline: true,
 			},
-			&discordgo.MessageEmbedField{
+			{
 				Name:   "source",
 				Value:  track.Info.SourceName,
 				Inline: true,
@@ -40,13 +40,13 @@ func embedPlayFoundPlaylist(playlist lavalink.Playlist, link string) *discordgo.
 		Color: 0xff4700,
 		Title: "🎵 added the playlist",
 		Fields: []*discordgo.MessageEmbedField{
-			&discordgo.MessageEmbedField{
+			{
 				Name:   "playlist",
 				Value:  fmt.Sprintf("[%s](%s)", playlist.Info.Name, link),
 				Inline: false,
 			},
 
-			&discordgo.MessageEmbedField{
+			{
 				Name:   "tracks",
 				Value:  fmt.Sprintf("%d", len(playlist.Tracks)),
 				Inline: true,

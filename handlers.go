@@ -55,6 +55,10 @@ var (
 			Description: "Clears the current queue",
 		},
 		{
+			Name:        "skip",
+			Description: "skip a song",
+		},
+		{
 			Name:        "queue-type",
 			Description: "Sets the queue type",
 			Options: []*discordgo.ApplicationCommandOption{
@@ -102,6 +106,11 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		"clear-queue": c.ClearQueue,
 		"queue-type":  c.QueueType,
 		"shuffle":     c.Shuffle,
+		"skip":        c.Skip,
+		//in the
+		//move
+		//remove
+
 	}
 }
 

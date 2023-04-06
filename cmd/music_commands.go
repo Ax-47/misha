@@ -30,3 +30,6 @@ func (c *Cmd) QueueType(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func (c *Cmd) Shuffle(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	music.Shuffle(c.Ex, s, i, i.ApplicationCommandData())
 }
+func (c *Cmd) Skip(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Skip(c.Ex, s, i, i.ApplicationCommandData())
+}
