@@ -3,6 +3,7 @@ package lava
 import (
 	"math/rand"
 
+	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
 )
@@ -10,6 +11,7 @@ import (
 type Bot struct {
 	Lavalink disgolink.Client
 	Queues   *QueueManager
+	S        *discordgo.Session
 }
 
 type QueueType string

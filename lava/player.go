@@ -48,11 +48,13 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 	}
 
 	if !ok {
+		b.S.ChannelVoiceJoinManual(event.GuildID_.String(), "", false, false)
 		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {
 		log.Error("Failed to play next track: ", err)
 	}
+
 }
 
 func (b *Bot) OnTrackException(player disgolink.Player, event lavalink.TrackExceptionEvent) {

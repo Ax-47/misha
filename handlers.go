@@ -24,7 +24,7 @@ var (
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionString,
-					Name:        "identifier",
+					Name:        "query",
 					Description: "The song link or search query",
 					Required:    true,
 				},
@@ -41,10 +41,6 @@ var (
 		{
 			Name:        "stop",
 			Description: "Stops the current song and stops the player",
-		},
-		{
-			Name:        "players",
-			Description: "Shows all active players",
 		},
 		{
 			Name:        "shuffle",
@@ -94,8 +90,10 @@ func ComponentsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i 
 }
 func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"help":        c.Help,
-		"choose":      c.SetupChoose,
+		"help":   c.Help,
+		"choose": c.SetupChoose,
+
+		//music commands
 		"play":        c.Play,
 		"pause":       c.Pause,
 		"now-playing": c.NowPlaying,
@@ -107,7 +105,7 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 	}
 }
 
-func CommandsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+func Handlers(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.Type {
 	case discordgo.InteractionApplicationCommand:
 		if h, ok := CommandsHandlers_init(c)[i.ApplicationCommandData().Name]; ok {

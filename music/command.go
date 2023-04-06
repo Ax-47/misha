@@ -11,13 +11,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
-	"github.com/disgoorg/json"
 	"github.com/disgoorg/snowflake/v2"
 )
 
 var (
-	urlPattern    = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
-	searchPattern = regexp.MustCompile(`^(.{2})search:(.+)`)
+	urlPattern = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
 )
 
 func Shuffle(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
@@ -103,6 +101,9 @@ func Queue(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionC
 	var tracks string
 	for i, track := range queue.Tracks {
 		tracks += fmt.Sprintf("%d. [`%s`](<%s>)\n", i+1, track.Info.Title, *track.Info.URI)
+		if i >= 10 {
+			break
+		}
 	}
 
 	return s.InteractionRespond(event.Interaction, &discordgo.InteractionResponse{
@@ -212,7 +213,7 @@ func FormatPosition(position lavalink.Duration) string {
 
 func Play(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 	identifier := data.Options[0].StringValue()
-	if !urlPattern.MatchString(identifier) && !searchPattern.MatchString(identifier) {
+	if !urlPattern.MatchString(identifier) {
 		identifier = lavalink.SearchTypeYoutube.Apply(identifier)
 	}
 
@@ -242,7 +243,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCr
 	c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
 		func(track lavalink.Track) {
 			_, _ = s.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loading track: [`%s`](<%s>)", track.Info.Title, *track.Info.URI)),
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(track)},
 			})
 			if player.Track() == nil {
 				toPlay = &track
@@ -252,7 +253,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCr
 		},
 		func(playlist lavalink.Playlist) {
 			_, _ = s.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loaded playlist: `%s` with `%d` tracks", playlist.Info.Name, len(playlist.Tracks))),
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(playlist, identifier)},
 			})
 			if player.Track() == nil {
 				toPlay = &playlist.Tracks[0]
@@ -263,7 +264,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCr
 		},
 		func(tracks []lavalink.Track) {
 			_, _ = s.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Loaded search result: [`%s`](<%s>)", tracks[0].Info.Title, *tracks[0].Info.URI)),
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(tracks[0])},
 			})
 			if player.Track() == nil {
 				toPlay = &tracks[0]
@@ -273,12 +274,12 @@ func Play(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCr
 		},
 		func() {
 			_, _ = s.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Nothing found for: `%s`", identifier)),
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayNotFound()},
 			})
 		},
 		func(err error) {
 			_, _ = s.InteractionResponseEdit(event.Interaction, &discordgo.WebhookEdit{
-				Content: json.Ptr(fmt.Sprintf("Error while looking up query: `%s`", err)),
+				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
 			})
 		},
 	))
@@ -286,7 +287,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, event *discordgo.InteractionCr
 		return nil
 	}
 
-	if err := s.ChannelVoiceJoinManual(event.GuildID, voiceState.ChannelID, false, false); err != nil {
+	if err := s.ChannelVoiceJoinManual(event.GuildID, voiceState.ChannelID, false, true); err != nil {
 		return err
 	}
 

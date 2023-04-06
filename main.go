@@ -39,7 +39,7 @@ func init() {
 func init() {
 	c.Init(con.Database.Url, con.Database.Database, con.Database.Collection, s, con.Lavalink.Name, con.Lavalink.Address, con.Lavalink.Password, con.Lavalink.Https)
 
-	s.AddHandler(CommandsHandler)
+	s.AddHandler(Handlers)
 }
 func init() {
 	s.AddHandler(EventHandler)
@@ -54,7 +54,7 @@ func main() {
 	c.Ex.Bot.Queues = &lava.QueueManager{
 		Queues: make(map[string]*lava.Queue),
 	}
-
+	c.Ex.Bot.S = s
 	s.AddHandler(c.Ex.Bot.OnVoiceStateUpdate)
 	s.AddHandler(c.Ex.Bot.OnVoiceServerUpdate)
 	err := s.Open()
