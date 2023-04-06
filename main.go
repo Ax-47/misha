@@ -18,7 +18,6 @@ var (
 	s   *discordgo.Session
 	con *Config
 	c   cmd.Cmd
-	b   *lava.Bot
 )
 
 func init() {
@@ -52,15 +51,12 @@ func main() {
 	})
 	s.State.TrackVoice = true
 	s.Identify.Intents = discordgo.IntentsAll
-	b = &lava.Bot{
-		Session: s,
-		Queues: &lava.QueueManager{
-			Queues: make(map[string]*lava.Queue),
-		},
+	c.Ex.Bot.Queues = &lava.QueueManager{
+		Queues: make(map[string]*lava.Queue),
 	}
 
-	s.AddHandler(b.OnVoiceStateUpdate)
-	s.AddHandler(b.OnVoiceServerUpdate)
+	s.AddHandler(c.Ex.Bot.OnVoiceStateUpdate)
+	s.AddHandler(c.Ex.Bot.OnVoiceServerUpdate)
 	err := s.Open()
 	if err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
@@ -77,25 +73,15 @@ func main() {
 	}
 
 	defer s.Close()
-	b.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
-		disgolink.WithListenerFunc(b.OnPlayerPause),
-		disgolink.WithListenerFunc(b.OnPlayerResume),
-		disgolink.WithListenerFunc(b.OnTrackStart),
-		disgolink.WithListenerFunc(b.OnTrackEnd),
-		disgolink.WithListenerFunc(b.OnTrackException),
-		disgolink.WithListenerFunc(b.OnTrackStuck),
-		disgolink.WithListenerFunc(b.OnWebSocketClosed),
+	c.Ex.Bot.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnPlayerPause),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnPlayerResume),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackStart),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackEnd),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackException),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackStuck),
+		disgolink.WithListenerFunc(c.Ex.Bot.OnWebSocketClosed),
 	)
-	b.Handlers = map[string]func(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error{
-		"play":        b.Play,
-		"pause":       b.Pause,
-		"now-playing": b.NowPlaying,
-		"stop":        b.Stop,
-		"queue":       b.Queue,
-		"clear-queue": b.ClearQueue,
-		"queue-type":  b.QueueType,
-		"shuffle":     b.Shuffle,
-	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	nc := disgolink.NodeConfig{
@@ -105,7 +91,7 @@ func main() {
 		Secure:   con.Lavalink.Https,
 	}
 	log.Println(con.Lavalink.Address)
-	node, err := b.Lavalink.AddNode(ctx, nc)
+	node, err := c.Ex.Bot.Lavalink.AddNode(ctx, nc)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -114,6 +100,7 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("node version: %s", version)
+
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	log.Println("Press Ctrl+C to exit")

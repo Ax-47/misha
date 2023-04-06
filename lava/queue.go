@@ -3,15 +3,12 @@ package lava
 import (
 	"math/rand"
 
-	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
 )
 
 type Bot struct {
-	Session  *discordgo.Session
 	Lavalink disgolink.Client
-	Handlers map[string]func(event *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error
 	Queues   *QueueManager
 }
 

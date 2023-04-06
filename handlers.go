@@ -94,18 +94,24 @@ func ComponentsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i 
 }
 func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"help":   c.Help,
-		"choose": c.SetupChoose,
+		"help":        c.Help,
+		"choose":      c.SetupChoose,
+		"play":        c.Play,
+		"pause":       c.Pause,
+		"now-playing": c.NowPlaying,
+		"stop":        c.Stop,
+		"queue":       c.Queue,
+		"clear-queue": c.ClearQueue,
+		"queue-type":  c.QueueType,
+		"shuffle":     c.Shuffle,
 	}
 }
+
 func CommandsHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.Type {
 	case discordgo.InteractionApplicationCommand:
 		if h, ok := CommandsHandlers_init(c)[i.ApplicationCommandData().Name]; ok {
 			h(s, i)
-		}
-		if h, ok := b.Handlers[i.ApplicationCommandData().Name]; ok {
-			h(i, i.ApplicationCommandData())
 		}
 	case discordgo.InteractionMessageComponent:
 

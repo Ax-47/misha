@@ -4,12 +4,15 @@ import (
 	d "misha/database"
 	l "misha/languages"
 
+	"misha/lava"
+
 	"github.com/bwmarrin/discordgo"
 )
 
 type Ex struct {
 	languages map[string]l.Lang
 	DB        d.Database
+	Bot       lava.Bot
 }
 
 func (c *Ex) Init(url, database string, colls []string, s *discordgo.Session, name, address, password string, https bool) error {
