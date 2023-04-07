@@ -3,6 +3,7 @@ package lava
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/disgoorg/log"
 
@@ -30,6 +31,7 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 	}
 
 	queue := b.Queues.Get(event.GuildID().String())
+	auto := b.Queues.GetAuto(event.GuildID().String())
 	var (
 		nextTrack lavalink.Track
 		ok        bool
@@ -37,7 +39,7 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 	switch queue.Type {
 	case QueueTypeNormal:
 		nextTrack, ok = queue.Next()
-
+		b.Queues.Cache[event.GuildID().String()] = nextTrack.Info.Identifier
 	case QueueTypeRepeatTrack:
 		nextTrack = *player.Track()
 
@@ -46,11 +48,22 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		queue.Add(*lastTrack)
 		nextTrack, ok = queue.Next()
 	}
+	if auto {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		b.Lavalink.BestNode().LoadTracksHandler(ctx,
+			fmt.Sprintf("https://www.youtube.com/watch?v={%s}&list=RD{%s}", b.Queues.Cache[event.GuildID().String()], b.Queues.Cache[event.GuildID().String()]),
+			disgolink.NewResultHandler(func(track lavalink.Track) {
+				queue.Add(track)
+			}, func(playlist lavalink.Playlist) {}, func(tracks []lavalink.Track) {}, func() {}, func(err error) {}))
+		player.Update(context.TODO(), lavalink.WithTrack(nextTrack))
 
-	if !ok {
+	}
+	if !ok || !auto {
 		b.S.ChannelVoiceJoinManual(event.GuildID_.String(), "", false, false)
 		return
 	}
+
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {
 		log.Error("Failed to play next track: ", err)
 	}

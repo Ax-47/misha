@@ -33,3 +33,15 @@ func (c *Cmd) Shuffle(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func (c *Cmd) Skip(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	music.Skip(c.Ex, s, i, i.ApplicationCommandData())
 }
+func (c *Cmd) Seek(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Seek(c.Ex, s, i, i.ApplicationCommandData())
+}
+func (c *Cmd) Remove(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Remove(c.Ex, s, i, i.ApplicationCommandData())
+}
+func (c *Cmd) Move(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Move(c.Ex, s, i, i.ApplicationCommandData())
+}
+func (c *Cmd) Autoplay(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Autoplay(c.Ex, s, i, i.ApplicationCommandData())
+}

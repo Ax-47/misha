@@ -52,7 +52,9 @@ func main() {
 	s.State.TrackVoice = true
 	s.Identify.Intents = discordgo.IntentsAll
 	c.Ex.Bot.Queues = &lava.QueueManager{
-		Queues: make(map[string]*lava.Queue),
+		Queues:   make(map[string]*lava.Queue),
+		Autoplay: make(map[string]bool),
+		Cache:    make(map[string]string),
 	}
 	c.Ex.Bot.S = s
 	s.AddHandler(c.Ex.Bot.OnVoiceStateUpdate)

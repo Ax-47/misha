@@ -238,7 +238,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			},
 		})
 	}
-
+	c.Bot.Queues.Cache[i.GuildID] = ""
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 	}); err != nil {
@@ -260,6 +260,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			if player.Track() == nil {
 				toPlay = &track
 			} else {
+				c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
 				queue.Add(track)
 			}
 		},
@@ -282,6 +283,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				toPlay = &tracks[0]
 			} else {
 				queue.Add(tracks[0])
+				c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
 			}
 		},
 		func() {
@@ -321,13 +323,15 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	}
 	track, ok := queue.Next()
 	if !ok {
-		if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
-			return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{embedError(err)},
-				},
-			})
+		if !c.Bot.Queues.Autoplay[i.GuildID] {
+			if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
+				return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Embeds: []*discordgo.MessageEmbed{embedError(err)},
+					},
+				})
+			}
 		}
 	}
 
@@ -343,6 +347,103 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "Skipped",
+		},
+	})
+}
+func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
+	identifier := data.Options[0].IntValue()
+
+	if player == nil {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "No player found",
+			},
+		})
+	}
+
+	if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{embedError(err)},
+			},
+		})
+	}
+
+	if err := player.Update(context.TODO(), lavalink.WithPosition(lavalink.Duration(lavalink.Duration(identifier).Seconds()))); err != nil {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{embedError(err)},
+			},
+		})
+	}
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Seeked",
+		},
+	})
+}
+func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
+	identifier := data.Options[0].IntValue()
+	queue := c.Bot.Queues.Get(i.GuildID)
+	if player == nil || queue == nil {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "No player found",
+			},
+		})
+	}
+	queue.Delete(int(identifier))
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Delete",
+		},
+	})
+}
+func Move(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
+	adress1 := data.Options[0].IntValue()
+	adress2 := data.Options[1].IntValue()
+	queue := c.Bot.Queues.Get(i.GuildID)
+	if player == nil || queue == nil {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "No player found",
+			},
+		})
+	}
+	queue.Swap(int(adress1), int(adress2))
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Delete",
+		},
+	})
+}
+func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
+	autoplay := c.Bot.Queues.GetAuto(i.GuildID)
+	if player == nil {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "No player found",
+			},
+		})
+	}
+	c.Bot.Queues.Autoplay[i.GuildID] = !autoplay
+	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: "Autoplay",
 		},
 	})
 }

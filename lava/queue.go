@@ -49,7 +49,15 @@ func (q *Queue) Shuffle() {
 func (q *Queue) Add(track ...lavalink.Track) {
 	q.Tracks = append(q.Tracks, track...)
 }
+func (q *Queue) Delete(track int) {
 
+	q.Tracks = append(q.Tracks[:track], q.Tracks[track+1:]...)
+
+}
+func (q *Queue) Swap(track1, track2 int) {
+	q.Tracks[track1], q.Tracks[track2] = q.Tracks[track2], q.Tracks[track1]
+
+}
 func (q *Queue) Next() (lavalink.Track, bool) {
 	if len(q.Tracks) == 0 {
 		return lavalink.Track{}, false
@@ -64,7 +72,18 @@ func (q *Queue) Clear() {
 }
 
 type QueueManager struct {
-	Queues map[string]*Queue
+	Queues   map[string]*Queue
+	Autoplay map[string]bool
+	Cache    map[string]string
+}
+
+func (q *QueueManager) GetAuto(guildID string) bool {
+	Autoplay, ok := q.Autoplay[guildID]
+	if !ok {
+		Autoplay = false
+		q.Autoplay[guildID] = Autoplay
+	}
+	return Autoplay
 }
 
 func (q *QueueManager) Get(guildID string) *Queue {

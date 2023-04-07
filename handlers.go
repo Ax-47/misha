@@ -59,7 +59,53 @@ var (
 			Description: "skip a song",
 		},
 		{
-			Name:        "queue-type",
+			Name:        "seek",
+			Description: "Plays a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "sec",
+					Description: "Seek",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "remove",
+			Description: "Plays a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "adress",
+					Description: "Seek",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "move",
+			Description: "Plays a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "from",
+					Description: "adress1",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "to",
+					Description: "adress2",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "auto-play",
+			Description: "auto play",
+		},
+		{
+			Name:        "loop",
 			Description: "Sets the queue type",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
@@ -74,11 +120,11 @@ var (
 						},
 						{
 							Name:  "repeat-track",
-							Value: "repeat-track",
+							Value: "repeat_track",
 						},
 						{
 							Name:  "repeat-queue",
-							Value: "repeat-queue",
+							Value: "repeat_queue",
 						},
 					},
 				},
@@ -106,14 +152,15 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		"stop":        c.Stop,
 		"queue":       c.Queue,
 		"clear-queue": c.ClearQueue,
-		"queue-type":  c.QueueType,
+		"loop":        c.QueueType,
 		"shuffle":     c.Shuffle,
 		"skip":        c.Skip,
+		"seek":        c.Seek,
+		"move":        c.Move,
+		"remove":      c.Remove,
+		"auto-play":   c.Autoplay,
 		//in the future
-		//move
-		//remove
-		//seek
-		//auto play
+		//
 		//filter
 	}
 }
