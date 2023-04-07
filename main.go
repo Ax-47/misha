@@ -90,7 +90,6 @@ func main() {
 		Password: con.Lavalink.Password,
 		Secure:   con.Lavalink.Https,
 	}
-	log.Println(con.Lavalink.Address)
 	node, err := c.Ex.Bot.Lavalink.AddNode(ctx, nc)
 	if err != nil {
 		log.Fatal(err)

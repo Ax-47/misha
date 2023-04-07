@@ -78,46 +78,51 @@ func ClearQueue(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 	})
 }
 
-func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) {
 	queue := c.Bot.Queues.Get(i.GuildID)
 	if queue == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "No player found",
 			},
 		})
+		return
 	}
 
 	if len(queue.Tracks) == 0 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "No tracks in queue",
 			},
 		})
+		return
 	}
 
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedQueue(1, queue)},
+			Embeds: []*discordgo.MessageEmbed{embedQueue(1, queue, i.Member.User.ID)},
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
 						discordgo.Button{
-							Style:    discordgo.SuccessButton,
-							Emoji:    discordgo.ComponentEmoji{Name: "◀️"},
+							Label: "◀",
+							Style: discordgo.SuccessButton,
+
 							CustomID: "re",
 						},
 						discordgo.Button{
-							Style:    discordgo.SuccessButton,
-							Emoji:    discordgo.ComponentEmoji{Name: "▶️"},
+							Label: "▶",
+							Style: discordgo.SuccessButton,
+
 							CustomID: "next",
 						},
 						discordgo.Button{
-							Style:    discordgo.DangerButton,
-							Emoji:    discordgo.ComponentEmoji{Name: "🗙"},
+							Label: "🗙",
+							Style: discordgo.DangerButton,
+
 							CustomID: "close",
 						},
 					},

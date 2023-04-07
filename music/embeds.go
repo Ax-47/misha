@@ -72,27 +72,42 @@ func embedError(err error) *discordgo.MessageEmbed {
 	}
 }
 
-func embedQueue(index int, queue *lava.Queue) *discordgo.MessageEmbed {
+func embedQueue(index int, queue *lava.Queue, id string) *discordgo.MessageEmbed {
 	var tracks string
 	lengthtracks := len(queue.Tracks)
-	for i, track := range queue.Tracks {
-		if i > 9 {
-			break
-		}
-		tracks += fmt.Sprintf("%d : [`%s`](<%s>)\n", i+1, track.Info.Title, *track.Info.URI)
 
-	}
+	index = index - 1
+
 	pages := lengthtracks / 10
 	if lengthtracks%10 != 0 {
 		pages += 1
 	}
+	if index == -1 {
+		index = pages - 1
+
+	} else if index >= pages {
+		index = 0
+
+	}
+	end := index*10 + 10
+	if lengthtracks <= end {
+		end = lengthtracks
+	}
+	for i, track := range queue.Tracks[index*10 : end] {
+		if i >= 10 {
+			break
+		}
+		tracks += fmt.Sprintf("%d : [`%s`](<%s>)\n", (index*10)+i+1, track.Info.Title, *track.Info.URI)
+
+	}
 
 	return &discordgo.MessageEmbed{
 		Color:       0xff4700,
-		Title:       fmt.Sprintf("%d Track in Queue", lengthtracks),
+		Title:       fmt.Sprintf("%d Tracks in Queue", lengthtracks),
 		Description: tracks,
+
 		Footer: &discordgo.MessageEmbedFooter{
-			Text: fmt.Sprintf("page %d/%d ", index, pages),
+			Text: fmt.Sprintf("page %d/%d | %s", index+1, pages, id),
 		},
 	}
 }

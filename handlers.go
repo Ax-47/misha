@@ -90,6 +90,8 @@ var (
 func ComponentsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"select": c.HelpComponent,
+		"re":     c.HandlerComponentsQueuePrevious,
+		"next":   c.HandlerComponentsQueueNext,
 	}
 }
 func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
