@@ -109,10 +109,12 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		"queue-type":  c.QueueType,
 		"shuffle":     c.Shuffle,
 		"skip":        c.Skip,
-		//in the
+		//in the future
 		//move
 		//remove
-
+		//seek
+		//auto play
+		//filter
 	}
 }
 

@@ -119,12 +119,6 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 
 							CustomID: "next",
 						},
-						discordgo.Button{
-							Label: "🗙",
-							Style: discordgo.DangerButton,
-
-							CustomID: "close",
-						},
 					},
 				},
 			},
