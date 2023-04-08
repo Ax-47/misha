@@ -50,7 +50,10 @@ func (q *Queue) Add(track ...lavalink.Track) {
 	q.Tracks = append(q.Tracks, track...)
 }
 func (q *Queue) Delete(track int) {
-
+	if len(q.Tracks) == 1 {
+		q.Tracks = make([]lavalink.Track, 0)
+		return
+	}
 	q.Tracks = append(q.Tracks[:track], q.Tracks[track+1:]...)
 
 }

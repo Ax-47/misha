@@ -337,7 +337,6 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			}, func(playlist lavalink.Playlist) {
 				queue.Add(playlist.Tracks[r])
 				c.Bot.Queues.Cache[i.GuildID] = playlist.Tracks[r].Info.Identifier
-				fmt.Println(playlist.Tracks)
 			}, func(tracks []lavalink.Track) {
 			}, func() {},
 				func(err error) {
@@ -454,7 +453,6 @@ func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 		})
 	}
 	c.Bot.Queues.Autoplay[i.GuildID] = !autoplay
-	fmt.Println(c.Bot.Queues.Autoplay[i.GuildID])
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
