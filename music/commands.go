@@ -104,7 +104,7 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedQueue(c.Lang(i.User.Locale), 1, queue, i.Member.User.ID)},
+			Embeds: []*discordgo.MessageEmbed{embedQueue(c.Lang(i.Locale.String()), 1, queue, i.Member.User.ID)},
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -212,7 +212,7 @@ func NowPlaying(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Now playing: [`%s`](<%s>)\n\n %s / %s", track.Info.Title, *track.Info.URI, FormatPosition(player.Position()), FormatPosition(track.Info.Length)),
+			Embeds: []*discordgo.MessageEmbed{embedNow(c.Lang(i.Locale.String()), *track, player)},
 		},
 	})
 }
@@ -232,19 +232,32 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 
 	voiceState, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
 	if err != nil {
+		if err == discordgo.ErrStateNotFound {
+			return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{embedJoin(c.Lang(i.Locale.String()))},
+				},
+			})
+		}
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
+
 	}
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 	}); err != nil {
 		return err
 	}
-
+	if c.Bot.Lavalink == nil {
+		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Embeds: &[]*discordgo.MessageEmbed{embedErrorLavalink()},
+		})
+	}
 	player := c.Bot.Lavalink.Player(snowflake.MustParse(i.GuildID))
 	queue := c.Bot.Queues.Get(i.GuildID)
 

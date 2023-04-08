@@ -6,6 +6,7 @@ import (
 	"misha/lava"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
 )
 
@@ -89,6 +90,13 @@ func embedNotFoundTrack(l languages.Lang) *discordgo.MessageEmbed {
 		Title: l.MusicCommands.Errors.NotfoundTrack,
 	}
 }
+func embedJoin(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0x000,
+		Title: l.MusicCommands.Errors.UserWasNotJoin,
+	}
+}
+
 func embedError(err error) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color:       0xff4700,
@@ -96,7 +104,12 @@ func embedError(err error) *discordgo.MessageEmbed {
 		Description: err.Error(),
 	}
 }
-
+func embedErrorLavalink() *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: "error",
+	}
+}
 func embedQueue(l languages.Lang, index int, queue *lava.Queue, id string) *discordgo.MessageEmbed {
 	var tracks string
 	lengthtracks := len(queue.Tracks)
@@ -199,5 +212,25 @@ func embedAutoPlay(l languages.Lang, on bool) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
 		Title: fmt.Sprintf(l.MusicCommands.AutoPlay, status),
+	}
+}
+func embedNow(l languages.Lang, track lavalink.Track, player disgolink.Player) *discordgo.MessageEmbed {
+	duration := fmt.Sprintf("`%s-%s`", FormatPosition(player.Position()), FormatPosition(track.Info.Length))
+	if player.Track().Info.IsStream {
+		duration = fmt.Sprintf("`%s-🔴`", FormatPosition(player.Position()))
+	}
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: track.Info.Title,
+		URL:   fmt.Sprintf("https://youtu.be/%s", track.Info.Identifier),
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: fmt.Sprintf("https://i.ytimg.com/vi/%s/maxresdefault.jpg", track.Info.Identifier),
+		},
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:  "duration",
+				Value: duration,
+			},
+		},
 	}
 }
