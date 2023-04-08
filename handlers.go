@@ -14,11 +14,6 @@ var (
 			Type:        discordgo.ChatApplicationCommand,
 		},
 		{
-			Name:        "choose",
-			Description: "Basic command",
-			Type:        discordgo.ChatApplicationCommand,
-		},
-		{
 			Name:        "play",
 			Description: "Plays a song",
 			Options: []*discordgo.ApplicationCommandOption{
@@ -142,8 +137,7 @@ func ComponentsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i 
 }
 func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"help":   c.Help,
-		"choose": c.SetupChoose,
+		"help": c.Help,
 
 		//music commands
 		"play":        c.Play,
@@ -157,9 +151,8 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		"skip":        c.Skip,
 		"seek":        c.Seek,
 		"swap":        c.Swap,
-
-		"remove":    c.Remove,
-		"auto-play": c.Autoplay,
+		"remove":      c.Remove,
+		"auto-play":   c.Autoplay,
 		//in the future
 		//
 		//filter
