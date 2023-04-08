@@ -58,7 +58,7 @@ func (q *Queue) Delete(track int) {
 
 }
 func (q *Queue) Swap(track1, track2 int) {
-	q.Tracks[track1], q.Tracks[track2] = q.Tracks[track2], q.Tracks[track1]
+	q.Tracks[track1-1], q.Tracks[track2-1] = q.Tracks[track2-1], q.Tracks[track1-1]
 
 }
 func (q *Queue) Next() (lavalink.Track, bool) {
