@@ -36,7 +36,7 @@ func HandlerComponentsQueuePrevious(c *extensions.Ex, s *discordgo.Session, i *d
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedQueue(page-1, c.Bot.Queues.Get(i.GuildID), i.Member.User.ID)},
+			Embeds: []*discordgo.MessageEmbed{embedQueue(c.Lang(i.User.Locale), page-1, c.Bot.Queues.Get(i.GuildID), i.Member.User.ID)},
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -51,12 +51,6 @@ func HandlerComponentsQueuePrevious(c *extensions.Ex, s *discordgo.Session, i *d
 							Style: discordgo.SuccessButton,
 
 							CustomID: "next",
-						},
-						discordgo.Button{
-							Label: "🗙",
-							Style: discordgo.DangerButton,
-
-							CustomID: "close",
 						},
 					},
 				},
@@ -95,7 +89,7 @@ func HandlerComponentsQueueNext(c *extensions.Ex, s *discordgo.Session, i *disco
 	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedQueue(page+1, c.Bot.Queues.Get(i.GuildID), i.Member.User.ID)},
+			Embeds: []*discordgo.MessageEmbed{embedQueue(c.Lang(i.User.Locale), page+1, c.Bot.Queues.Get(i.GuildID), i.Member.User.ID)},
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -110,12 +104,6 @@ func HandlerComponentsQueueNext(c *extensions.Ex, s *discordgo.Session, i *disco
 							Style: discordgo.SuccessButton,
 
 							CustomID: "next",
-						},
-						discordgo.Button{
-							Label: "🗙",
-							Style: discordgo.DangerButton,
-
-							CustomID: "close",
 						},
 					},
 				},

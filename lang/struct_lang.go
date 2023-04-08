@@ -30,4 +30,27 @@ type Lang struct {
 			SelecterIsntAuthor string `json:"selecter_isnt_author"`
 		}
 	}
+	MusicCommands struct {
+		Errors struct {
+			PlayerNotFound        string
+			NotfoundTrack         string
+			TracksInQueueNotFound string
+			NotFoundTrackPlaying  string
+			UserWasNotJoin        string
+			QueueLessThanTwo      string
+		}
+		PlayTrack    string
+		PlayPlaylist string
+		Queue        string
+		Skip         string
+		Stop         string
+		Shuffle      string
+		Pause        string
+		ClearQueue   string
+		Loop         string
+		Seek         string
+		Swap         string
+		Remove       string
+		AutoPlay     string
+	}
 }

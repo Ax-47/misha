@@ -25,7 +25,7 @@ func Shuffle(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -34,7 +34,7 @@ func Shuffle(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Queue shuffled",
+			Embeds: []*discordgo.MessageEmbed{embedShifle(c.Lang(i.Locale.String()))},
 		},
 	})
 }
@@ -45,7 +45,7 @@ func QueueType(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -54,7 +54,7 @@ func QueueType(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Queue type set to `%s`", queue.Type),
+			Embeds: []*discordgo.MessageEmbed{embedLoop(c.Lang(i.Locale.String()), queue.Type.String())},
 		},
 	})
 }
@@ -65,7 +65,7 @@ func ClearQueue(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -74,7 +74,7 @@ func ClearQueue(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Queue cleared",
+			Embeds: []*discordgo.MessageEmbed{embedClearQueue(c.Lang(i.Locale.String()))},
 		},
 	})
 }
@@ -85,7 +85,7 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 		return
@@ -95,7 +95,7 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No tracks in queue",
+				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 		return
@@ -104,7 +104,7 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedQueue(1, queue, i.Member.User.ID)},
+			Embeds: []*discordgo.MessageEmbed{embedQueue(c.Lang(i.User.Locale), 1, queue, i.Member.User.ID)},
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -133,7 +133,7 @@ func Pause(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -155,7 +155,7 @@ func Pause(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: fmt.Sprintf("Player is now %s", status),
+			Embeds: []*discordgo.MessageEmbed{embedPause(c.Lang(i.Locale.String()), status)},
 		},
 	})
 }
@@ -166,7 +166,7 @@ func Stop(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -183,7 +183,7 @@ func Stop(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Player stopped",
+			Embeds: []*discordgo.MessageEmbed{embedStop(c.Lang(i.Locale.String()))},
 		},
 	})
 }
@@ -194,7 +194,7 @@ func NowPlaying(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -204,7 +204,7 @@ func NowPlaying(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No track found",
+				Embeds: []*discordgo.MessageEmbed{embedNotFoundTrackPlaying(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -239,7 +239,6 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			},
 		})
 	}
-	c.Bot.Queues.Cache[i.GuildID] = "QpiCSmdYPRU"
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 	}); err != nil {
@@ -256,7 +255,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
 		func(track lavalink.Track) {
 			_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(track)},
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(c.Lang(i.Locale.String()), track)},
 			})
 			c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
 			if player.Track() == nil {
@@ -268,7 +267,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		},
 		func(playlist lavalink.Playlist) {
 			_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(playlist, identifier)},
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(c.Lang(i.Locale.String()), playlist, identifier)},
 			})
 			if player.Track() == nil {
 				toPlay = &playlist.Tracks[0]
@@ -279,7 +278,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		},
 		func(tracks []lavalink.Track) {
 			_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(tracks[0])},
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(c.Lang(i.Locale.String()), tracks[0])},
 			})
 			c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
 			if player.Track() == nil {
@@ -291,7 +290,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		},
 		func() {
 			_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayNotFound()},
+				Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(c.Lang(i.Locale.String()))},
 			})
 		},
 		func(err error) {
@@ -320,7 +319,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -368,7 +367,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Skipped",
+			Embeds: []*discordgo.MessageEmbed{embedSkip(c.Lang(i.Locale.String()))},
 		},
 	})
 }
@@ -380,12 +379,12 @@ func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
-
-	if err := player.Update(context.TODO(), lavalink.WithPosition(lavalink.Duration(lavalink.Duration(identifier).Seconds()))); err != nil {
+	duration := lavalink.Duration(lavalink.Duration(identifier).Seconds())
+	if err := player.Update(context.TODO(), lavalink.WithPosition(duration)); err != nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -396,7 +395,7 @@ func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Seeked",
+			Embeds: []*discordgo.MessageEmbed{embedSeek(c.Lang(i.Locale.String()), FormatPosition(duration))},
 		},
 	})
 }
@@ -408,19 +407,29 @@ func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
+	if len(queue.Tracks) == 0 {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(c.Lang(i.Locale.String()))},
+			},
+		})
+
+	}
+	song := queue.Tracks[identifier-1].Info.Title
 	queue.Delete(int(identifier))
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Delete",
+			Embeds: []*discordgo.MessageEmbed{embedRemove(c.Lang(i.Locale.String()), song)},
 		},
 	})
 }
-func Move(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
+func Swap(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate, data discordgo.ApplicationCommandInteractionData) error {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	adress1 := data.Options[0].IntValue()
 	adress2 := data.Options[1].IntValue()
@@ -429,15 +438,35 @@ func Move(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
+	if len(queue.Tracks) == 0 {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(c.Lang(i.Locale.String()))},
+			},
+		})
+
+	}
+	if len(queue.Tracks) < 2 {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{embedQueueLessThanTwo(c.Lang(i.Locale.String()))},
+			},
+		})
+
+	}
+	song1 := queue.Tracks[adress1-1].Info.Title
+	song2 := queue.Tracks[adress2-1].Info.Title
 	queue.Swap(int(adress1), int(adress2))
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Delete",
+			Embeds: []*discordgo.MessageEmbed{embedSwap(c.Lang(i.Locale.String()), song1, song2)},
 		},
 	})
 }
@@ -448,7 +477,7 @@ func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "No player found",
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
 	}
@@ -456,7 +485,7 @@ func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: "Autoplay",
+			Embeds: []*discordgo.MessageEmbed{embedAutoPlay(c.Lang(i.Locale.String()), !autoplay)},
 		},
 	})
 }

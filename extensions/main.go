@@ -2,7 +2,7 @@ package extensions
 
 import (
 	d "misha/database"
-	l "misha/languages"
+	l "misha/lang"
 
 	"misha/lava"
 

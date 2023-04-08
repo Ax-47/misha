@@ -83,7 +83,7 @@ var (
 			},
 		},
 		{
-			Name:        "move",
+			Name:        "swap",
 			Description: "Plays a song",
 			Options: []*discordgo.ApplicationCommandOption{
 				{
@@ -156,9 +156,10 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		"shuffle":     c.Shuffle,
 		"skip":        c.Skip,
 		"seek":        c.Seek,
-		"move":        c.Move,
-		"remove":      c.Remove,
-		"auto-play":   c.Autoplay,
+		"swap":        c.Swap,
+
+		"remove":    c.Remove,
+		"auto-play": c.Autoplay,
 		//in the future
 		//
 		//filter

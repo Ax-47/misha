@@ -2,16 +2,17 @@ package music
 
 import (
 	"fmt"
+	languages "misha/lang"
 	"misha/lava"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/lavalink"
 )
 
-func embedPlayFoundTrack(track lavalink.Track) *discordgo.MessageEmbed {
+func embedPlayFoundTrack(l languages.Lang, track lavalink.Track) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
-		Title: "🎵 added track",
+		Title: l.MusicCommands.PlayTrack,
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "song",
@@ -36,10 +37,10 @@ func embedPlayFoundTrack(track lavalink.Track) *discordgo.MessageEmbed {
 		},
 	}
 }
-func embedPlayFoundPlaylist(playlist lavalink.Playlist, link string) *discordgo.MessageEmbed {
+func embedPlayFoundPlaylist(l languages.Lang, playlist lavalink.Playlist, link string) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
-		Title: "🎵 added the playlist",
+		Title: l.MusicCommands.PlayPlaylist,
 		Fields: []*discordgo.MessageEmbedField{
 			{
 				Name:   "playlist",
@@ -58,10 +59,34 @@ func embedPlayFoundPlaylist(playlist lavalink.Playlist, link string) *discordgo.
 		},
 	}
 }
-func embedPlayNotFound() *discordgo.MessageEmbed {
+func embedPlayerNotFound(l languages.Lang) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
-		Title: ">_ 404 Not Found ",
+		Title: l.MusicCommands.Errors.PlayerNotFound,
+	}
+}
+func embedTracksInQueueNotFound(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Errors.TracksInQueueNotFound,
+	}
+}
+func embedQueueLessThanTwo(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Errors.QueueLessThanTwo,
+	}
+}
+func embedNotFoundTrackPlaying(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Errors.NotFoundTrackPlaying,
+	}
+}
+func embedNotFoundTrack(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0x000,
+		Title: l.MusicCommands.Errors.NotfoundTrack,
 	}
 }
 func embedError(err error) *discordgo.MessageEmbed {
@@ -72,7 +97,7 @@ func embedError(err error) *discordgo.MessageEmbed {
 	}
 }
 
-func embedQueue(index int, queue *lava.Queue, id string) *discordgo.MessageEmbed {
+func embedQueue(l languages.Lang, index int, queue *lava.Queue, id string) *discordgo.MessageEmbed {
 	var tracks string
 	lengthtracks := len(queue.Tracks)
 
@@ -103,11 +128,76 @@ func embedQueue(index int, queue *lava.Queue, id string) *discordgo.MessageEmbed
 
 	return &discordgo.MessageEmbed{
 		Color:       0xff4700,
-		Title:       fmt.Sprintf("%d Tracks in Queue", lengthtracks),
+		Title:       fmt.Sprintf(l.MusicCommands.Queue, lengthtracks),
 		Description: tracks,
 
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: fmt.Sprintf("page %d/%d | %s", index+1, pages, id),
 		},
+	}
+}
+func embedShifle(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Shuffle,
+	}
+}
+func embedSkip(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Skip,
+	}
+}
+func embedStop(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Stop,
+	}
+}
+func embedPause(l languages.Lang, status string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.MusicCommands.Pause, status),
+	}
+}
+func embedClearQueue(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.ClearQueue,
+	}
+}
+func embedLoop(l languages.Lang, typeloop string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.MusicCommands.Loop, typeloop),
+	}
+}
+func embedSeek(l languages.Lang, duration string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.MusicCommands.Seek, duration),
+	}
+}
+func embedSwap(l languages.Lang, song1, song2 string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.MusicCommands.Swap, song1, song2),
+	}
+}
+func embedRemove(l languages.Lang, title string) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.MusicCommands.Seek, title),
+	}
+}
+func embedAutoPlay(l languages.Lang, on bool) *discordgo.MessageEmbed {
+	var status string
+	status = "on"
+	if !on {
+		status = "off"
+	}
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.MusicCommands.AutoPlay, status),
 	}
 }
