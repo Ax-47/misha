@@ -3,6 +3,7 @@ package music
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"misha/extensions"
 	"misha/lava"
 	"regexp"
@@ -238,7 +239,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			},
 		})
 	}
-	c.Bot.Queues.Cache[i.GuildID] = ""
+	c.Bot.Queues.Cache[i.GuildID] = "QpiCSmdYPRU"
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 	}); err != nil {
@@ -257,10 +258,11 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(track)},
 			})
+			c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
 			if player.Track() == nil {
 				toPlay = &track
 			} else {
-				c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
+
 				queue.Add(track)
 			}
 		},
@@ -279,11 +281,12 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			_, _ = s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(tracks[0])},
 			})
+			c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
 			if player.Track() == nil {
 				toPlay = &tracks[0]
 			} else {
 				queue.Add(tracks[0])
-				c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
+
 			}
 		},
 		func() {
@@ -321,18 +324,37 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			},
 		})
 	}
+	if c.Bot.Queues.GetAuto(i.GuildID) {
+		r := rand.Intn(25)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		cache := c.Bot.Queues.Cache[i.GuildID]
+
+		c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx,
+			fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache),
+			disgolink.NewResultHandler(func(track lavalink.Track) {
+			}, func(playlist lavalink.Playlist) {
+				queue.Add(playlist.Tracks[r])
+				c.Bot.Queues.Cache[i.GuildID] = playlist.Tracks[r].Info.Identifier
+				fmt.Println(playlist.Tracks)
+			}, func(tracks []lavalink.Track) {
+			}, func() {},
+				func(err error) {
+					fmt.Println(err)
+				}))
+	}
 	track, ok := queue.Next()
 	if !ok {
-		if !c.Bot.Queues.Autoplay[i.GuildID] {
-			if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
-				return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-					Type: discordgo.InteractionResponseChannelMessageWithSource,
-					Data: &discordgo.InteractionResponseData{
-						Embeds: []*discordgo.MessageEmbed{embedError(err)},
-					},
-				})
-			}
+		if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
+			return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{embedError(err)},
+				},
+			})
 		}
+
 	}
 
 	if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
@@ -343,6 +365,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			},
 		})
 	}
+
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
@@ -359,15 +382,6 @@ func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: "No player found",
-			},
-		})
-	}
-
-	if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
 	}
@@ -440,6 +454,7 @@ func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 		})
 	}
 	c.Bot.Queues.Autoplay[i.GuildID] = !autoplay
+	fmt.Println(c.Bot.Queues.Autoplay[i.GuildID])
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{

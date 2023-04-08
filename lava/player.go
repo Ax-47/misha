@@ -3,6 +3,7 @@ package lava
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/disgoorg/log"
@@ -20,26 +21,43 @@ func (b *Bot) OnPlayerResume(player disgolink.Player, event lavalink.PlayerResum
 }
 
 func (b *Bot) OnTrackStart(player disgolink.Player, event lavalink.TrackStartEvent) {
-	fmt.Printf("onTrackStart: %v\n", event)
+
+	fmt.Printf("onTrackStart: %v\n", b.Queues.Cache[event.GuildID().String()])
 }
 
 func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) {
-	fmt.Printf("onTrackEnd: %v\n", event)
-
 	if !event.Reason.MayStartNext() {
 		return
 	}
-
+	fmt.Printf("onTrackEnd: %v\n", event)
 	queue := b.Queues.Get(event.GuildID().String())
 	auto := b.Queues.GetAuto(event.GuildID().String())
 	var (
 		nextTrack lavalink.Track
 		ok        bool
 	)
+	if auto {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		cache := b.Queues.Cache[event.GuildID().String()]
+		url := fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache)
+		b.Lavalink.BestNode().LoadTracksHandler(ctx,
+			url,
+			disgolink.NewResultHandler(func(track lavalink.Track) {
+			}, func(playlist lavalink.Playlist) {
+				queue.Add(playlist.Tracks[rand.Intn(25)])
+			}, func(tracks []lavalink.Track) {
+			}, func() {},
+				func(err error) {
+					fmt.Println(err)
+				}))
+	}
 	switch queue.Type {
 	case QueueTypeNormal:
 		nextTrack, ok = queue.Next()
-		b.Queues.Cache[event.GuildID().String()] = nextTrack.Info.Identifier
+		if ok {
+			b.Queues.Cache[event.GuildID().String()] = nextTrack.Info.Identifier
+		}
 	case QueueTypeRepeatTrack:
 		nextTrack = *player.Track()
 
@@ -48,18 +66,8 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		queue.Add(*lastTrack)
 		nextTrack, ok = queue.Next()
 	}
-	if auto {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		b.Lavalink.BestNode().LoadTracksHandler(ctx,
-			fmt.Sprintf("https://www.youtube.com/watch?v={%s}&list=RD{%s}", b.Queues.Cache[event.GuildID().String()], b.Queues.Cache[event.GuildID().String()]),
-			disgolink.NewResultHandler(func(track lavalink.Track) {
-				queue.Add(track)
-			}, func(playlist lavalink.Playlist) {}, func(tracks []lavalink.Track) {}, func() {}, func(err error) {}))
-		player.Update(context.TODO(), lavalink.WithTrack(nextTrack))
 
-	}
-	if !ok || !auto {
+	if !ok && !auto {
 		b.S.ChannelVoiceJoinManual(event.GuildID_.String(), "", false, false)
 		return
 	}
