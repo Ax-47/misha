@@ -217,7 +217,7 @@ func embedAutoPlay(l languages.Lang, on bool) *discordgo.MessageEmbed {
 func embedNow(l languages.Lang, track lavalink.Track, player disgolink.Player) *discordgo.MessageEmbed {
 	duration := fmt.Sprintf("`%s-%s`", FormatPosition(player.Position()), FormatPosition(track.Info.Length))
 	if player.Track().Info.IsStream {
-		duration = fmt.Sprintf("`%s-🔴`", FormatPosition(player.Position()))
+		duration = fmt.Sprintf("`%s🔴`", FormatPosition(player.Position()))
 	}
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
