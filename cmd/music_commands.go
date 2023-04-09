@@ -46,3 +46,12 @@ func (c *Cmd) Swap(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func (c *Cmd) Autoplay(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	music.Autoplay(c.Ex, s, i, i.ApplicationCommandData())
 }
+func (c *Cmd) Bassbosts(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Bassbost(c.Ex, s, i)
+}
+func (c *Cmd) Timescale(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Timescale(c.Ex, s, i)
+}
+func (c *Cmd) Nightcore(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Nightcore(c.Ex, s, i)
+}

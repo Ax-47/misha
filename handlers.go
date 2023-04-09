@@ -100,6 +100,10 @@ var (
 			Description: "auto play",
 		},
 		{
+			Name:        "nightcore",
+			Description: "auto play",
+		},
+		{
 			Name:        "loop",
 			Description: "Sets the queue type",
 			Options: []*discordgo.ApplicationCommandOption{
@@ -120,6 +124,64 @@ var (
 						{
 							Name:  "repeat-queue",
 							Value: "repeat_queue",
+						},
+					},
+				},
+			},
+		}, {
+			Name:        "equalizer",
+			Description: "equalizer",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "type",
+					Description: "The queue type",
+					Required:    true,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
+						{
+							Name:  "radio",
+							Value: "radio",
+						},
+						{
+							Name:  "electronic",
+							Value: "electronic",
+						},
+						{
+							Name:  "gaming",
+							Value: "gaming",
+						},
+						{
+							Name:  "classical",
+							Value: "classical",
+						},
+						{
+							Name:  "pop",
+							Value: "pop",
+						},
+						{
+							Name:  "rock",
+							Value: "rock",
+						}, {
+							Name:  "bassboost",
+							Value: "bassboost",
+						}, {
+							Name:  "bass",
+							Value: "bass",
+						}, {
+							Name:  "bassboosthigh",
+							Value: "bassboosthigh",
+						}, {
+							Name:  "highfull",
+							Value: "highfull",
+						}, {
+							Name:  "treblebass",
+							Value: "treblebass",
+						}, {
+							Name:  "clean",
+							Value: "clean",
+						}, {
+							Name:  "wtf",
+							Value: "wtf",
 						},
 					},
 				},
@@ -153,9 +215,19 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		"swap":        c.Swap,
 		"remove":      c.Remove,
 		"auto-play":   c.Autoplay,
-		//in the future
-		//
-		//filter
+		// in the future
+		// filter
+		"equalizer": c.Bassbosts,
+		"timescale": c.Timescale,
+		"nightcore": c.Nightcore,
+		// "karaoke"
+		// "rotation"
+		// "smoothing"
+		// "vibrato"
+		// "tremolo"
+		// "depth"
+		// "frequency"
+		// "clean"
 	}
 }
 

@@ -53,4 +53,9 @@ type Lang struct {
 		Remove       string
 		AutoPlay     string
 	}
+	FilterCommands struct {
+		Errors struct {
+			TimescaleErrorInput string
+		}
+	}
 }

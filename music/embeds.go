@@ -234,3 +234,17 @@ func embedNow(l languages.Lang, track lavalink.Track, player disgolink.Player) *
 		},
 	}
 }
+func embedEqualizer(typeEq string) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: "Equalizer:" + typeEq,
+	}
+}
+func embedTimescaleErrorInput(l languages.Lang, err string) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf(l.FilterCommands.Errors.TimescaleErrorInput, err),
+	}
+}

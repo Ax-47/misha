@@ -50,5 +50,10 @@
         "swap": "สลับ `%s` กับ `%s`",
         "remove": "ลบ `%s` จากคิวแล้ว",
         "autoPlay": "autoplay: `%s`"
+    },
+    "FilterCommands": {
+        "errors": {
+            "TimescaleErrorInput": "ค่า`%s`ต้องไม่น้อย0.1"
+        }
     }
 }
