@@ -238,9 +238,11 @@ func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 			},
 		})
 	}
-	var t lavalink.Timescale
-	t.Speed = i.ApplicationCommandData().Options[0].FloatValue()
-	if t.Speed <= 0 {
+
+	filter := player.Filters()
+	filter.Timescale = &lavalink.Timescale{}
+	filter.Timescale.Speed = i.ApplicationCommandData().Options[0].FloatValue()
+	if filter.Timescale.Speed <= 0 {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -248,8 +250,8 @@ func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 			},
 		})
 	}
-	t.Pitch = i.ApplicationCommandData().Options[1].FloatValue()
-	if t.Pitch <= 0 {
+	filter.Timescale.Pitch = i.ApplicationCommandData().Options[1].FloatValue()
+	if filter.Timescale.Pitch <= 0 {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -257,8 +259,8 @@ func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 			},
 		})
 	}
-	t.Rate = i.ApplicationCommandData().Options[2].FloatValue()
-	if t.Rate <= 0 {
+	filter.Timescale.Rate = i.ApplicationCommandData().Options[2].FloatValue()
+	if filter.Timescale.Rate <= 0 {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -266,7 +268,7 @@ func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 			},
 		})
 	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{})); err != nil {
+	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -292,16 +294,18 @@ func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 		})
 	}
 	var t lavalink.Tremolo
-	t.Frequency = float32(i.ApplicationCommandData().Options[0].FloatValue())
+	filter := player.Filters()
+	filter.Tremolo = &lavalink.Tremolo{}
+	filter.Tremolo.Frequency = float32(i.ApplicationCommandData().Options[0].FloatValue())
 	if t.Frequency < 0 {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "Tremolo")},
+				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "Frequency")},
 			},
 		})
 	}
-	t.Depth = float32(i.ApplicationCommandData().Options[1].FloatValue())
+	filter.Tremolo.Depth = float32(i.ApplicationCommandData().Options[1].FloatValue())
 	if t.Depth < 0 || t.Depth >= 1 {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -310,7 +314,7 @@ func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 			},
 		})
 	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{})); err != nil {
+	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{

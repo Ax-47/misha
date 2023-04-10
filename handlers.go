@@ -108,6 +108,48 @@ var (
 			},
 		},
 		{
+			Name:        "timescale",
+			Description: "Plays a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "speed",
+					Description: "adress1",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "pitch",
+					Description: "adress2",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "rate",
+					Description: "adress2",
+					Required:    true,
+				},
+			},
+		},
+		{
+			Name:        "tremolo",
+			Description: "Plays a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "frequency",
+					Description: "adress1",
+					Required:    true,
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "depth",
+					Description: "adress2",
+					Required:    true,
+				},
+			},
+		},
+		{
 			Name:        "auto-play",
 			Description: "auto play",
 		},
@@ -274,6 +316,7 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		// filter
 		"equalizer": c.Bassbosts,
 		"timescale": c.Timescale,
+		"tremolo":   c.Tremolo,
 		"filter":    c.Filter,
 		"volume":    c.Volume,
 	}

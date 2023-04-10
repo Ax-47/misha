@@ -32,8 +32,10 @@ auto-play
 
 equelizer
 
+tremolo
+
 timescale
 
-template-filter
+filters
 
 volume

@@ -238,7 +238,7 @@ func embedEqualizer(typeEq string) *discordgo.MessageEmbed {
 
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
-		Title: "Equalizer:" + typeEq,
+		Title: fmt.Sprintf("Equalizer: `%s`", typeEq),
 	}
 }
 func embedTimescaleErrorInput(l languages.Lang, err string) *discordgo.MessageEmbed {
