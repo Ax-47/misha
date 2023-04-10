@@ -248,3 +248,10 @@ func embedTimescaleErrorInput(l languages.Lang, err string) *discordgo.MessageEm
 		Title: fmt.Sprintf(l.FilterCommands.Errors.TimescaleErrorInput, err),
 	}
 }
+func embedFilters(filter string) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf("Filter: `%s`", filter),
+	}
+}

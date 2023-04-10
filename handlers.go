@@ -78,6 +78,18 @@ var (
 			},
 		},
 		{
+			Name:        "volume",
+			Description: "Plays a song",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionInteger,
+					Name:        "vol",
+					Description: "Seek",
+					Required:    true,
+				},
+			},
+		},
+		{
 			Name:        "swap",
 			Description: "Plays a song",
 			Options: []*discordgo.ApplicationCommandOption{
@@ -100,8 +112,51 @@ var (
 			Description: "auto play",
 		},
 		{
-			Name:        "nightcore",
+			Name:        "filter",
 			Description: "auto play",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionString,
+					Name:        "type",
+					Description: "The queue type",
+					Required:    true,
+					Choices: []*discordgo.ApplicationCommandOptionChoice{
+						{
+							Name:  "Karaoke",
+							Value: "karaoke",
+						},
+						{
+							Name:  "8d",
+							Value: "8d",
+						},
+						{
+							Name:  "Smoothing",
+							Value: "smoothing",
+						},
+						{
+							Name:  "Nightcore",
+							Value: "nightcore",
+						},
+
+						{
+							Name:  "LoveNightcore",
+							Value: "lovenightcore",
+						},
+						{
+							Name:  "Superfast",
+							Value: "superfast",
+						},
+						{
+							Name:  "Vaporewave",
+							Value: "vaporewave",
+						},
+						{
+							Name:  "Reset",
+							Value: "reset",
+						},
+					},
+				},
+			},
 		},
 		{
 			Name:        "loop",
@@ -219,15 +274,8 @@ func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *d
 		// filter
 		"equalizer": c.Bassbosts,
 		"timescale": c.Timescale,
-		"nightcore": c.Nightcore,
-		// "karaoke"
-		// "rotation"
-		// "smoothing"
-		// "vibrato"
-		// "tremolo"
-		// "depth"
-		// "frequency"
-		// "clean"
+		"filter":    c.Filter,
+		"volume":    c.Volume,
 	}
 }
 

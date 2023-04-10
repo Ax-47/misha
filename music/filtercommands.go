@@ -22,7 +22,7 @@ func Bassbost(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 		})
 	}
 	var eq lavalink.Equalizer
-
+	filter := player.Filters()
 	switch identifier {
 	case "radio":
 		eq[0] = 0.65
@@ -203,24 +203,16 @@ func Bassbost(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 		eq[12] = 0.55
 		eq[13] = 0
 	case "wtf":
-		eq[0] = 1
-		eq[1] = 1
-		eq[2] = 1
-		eq[3] = 1
-		eq[4] = 1
-		eq[5] = 1
-		eq[6] = 1
-		eq[7] = 1
-		eq[8] = 1
-		eq[9] = 1
-		eq[10] = 1
-		eq[11] = 1
-		eq[12] = 1
-		eq[13] = 1
-		eq[14] = 1
+		for i := 0; i < 15; i++ {
+			eq[i] = 1
+		}
 	case "clean":
+		for i := 0; i < 15; i++ {
+			eq[i] = 0
+		}
 	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{Equalizer: &eq})); err != nil {
+	filter.Equalizer = &eq
+	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -289,43 +281,6 @@ func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 		},
 	})
 }
-func Karaoke(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
-
-	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
-			},
-		})
-	}
-	k := &lavalink.Karaoke{}
-	if player.Filters().Karaoke.Level != 1 ||
-		player.Filters().Karaoke.MonoLevel != 1 ||
-		player.Filters().Karaoke.FilterBand != 220.0 ||
-		player.Filters().Karaoke.FilterWidth != 100.0 {
-		k = &lavalink.Karaoke{Level: 1.0,
-			MonoLevel:   1.0,
-			FilterBand:  220.0,
-			FilterWidth: 100.0,
-		}
-	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{Karaoke: k})); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
-		},
-	})
-}
 func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
@@ -370,9 +325,9 @@ func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 		},
 	})
 }
-func Audio8D(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
+func Volume(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
 
+	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -381,11 +336,17 @@ func Audio8D(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 			},
 		})
 	}
-	k := &lavalink.Rotation{}
-	if player.Filters().Rotation.RotationHz != 2 {
-		k.RotationHz = 2
+
+	volume := int(i.ApplicationCommandData().Options[0].IntValue())
+	if volume <= 0 || volume > 500 {
+		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Embeds: []*discordgo.MessageEmbed{},
+			},
+		})
 	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{Rotation: k})); err != nil {
+	if err := player.Update(context.TODO(), lavalink.WithVolume(volume)); err != nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -399,147 +360,57 @@ func Audio8D(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 			Embeds: []*discordgo.MessageEmbed{},
 		},
 	})
-}
-func Smoothing(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 
-	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
-			},
-		})
-	}
-	k := &lavalink.LowPass{}
-	if player.Filters().LowPass.Smoothing != 20.0 {
-		k.Smoothing = 20.0
-	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{LowPass: k})); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
-		},
-	})
 }
-func Nightcore(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 
-	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
-			},
-		})
-	}
-	k := &lavalink.Timescale{}
-	if player.Filters().Timescale.Speed != 1.3 ||
-		player.Filters().Timescale.Pitch != 1.3 ||
-		player.Filters().Timescale.Rate != 1.0 {
-		k = &lavalink.Timescale{
+func Filter(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
+	filter := player.Filters()
+	var eq lavalink.Equalizer
+	f := i.ApplicationCommandData().Options[0].StringValue()
+	switch f {
+	case "karaoke":
+		filter.Karaoke = &lavalink.Karaoke{Level: 1.0,
+			MonoLevel:   1.0,
+			FilterBand:  220.0,
+			FilterWidth: 100.0,
+		}
+	case "8d":
+		filter.Rotation = &lavalink.Rotation{
+			RotationHz: 0.2,
+		}
+	case "smoothing":
+		filter.LowPass = &lavalink.LowPass{
+			Smoothing: 20,
+		}
+	case "nightcore":
+		filter.Timescale = &lavalink.Timescale{
 			Speed: 1.3,
 			Pitch: 1.3,
 			Rate:  1.0,
 		}
-	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{Timescale: k})); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
-		},
-	})
-}
-func LoveNightcore(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
-
-	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
-			},
-		})
-	}
-	k := &lavalink.Timescale{}
-	if player.Filters().Timescale.Speed != 1.1 ||
-		player.Filters().Timescale.Pitch != 1.2 ||
-		player.Filters().Timescale.Rate != 1.0 {
-		k = &lavalink.Timescale{
+	case "lovenightcore":
+		filter.Timescale = &lavalink.Timescale{
 			Speed: 1.1,
 			Pitch: 1.2,
 			Rate:  1.0,
 		}
-	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{Timescale: k})); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
-		},
-	})
-}
-func SuperFast(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
-
-	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
-			},
-		})
-	}
-	k := &lavalink.Timescale{}
-	if player.Filters().Timescale.Speed != 1.5010 ||
-		player.Filters().Timescale.Pitch != 1.2450 ||
-		player.Filters().Timescale.Rate != 1.9210 {
-		k = &lavalink.Timescale{
+	case "superfast":
+		filter.Timescale = &lavalink.Timescale{
 			Speed: 1.5010,
 			Pitch: 1.2450,
 			Rate:  1.9210,
 		}
+	case "vaporewave":
+
+		eq[0] = 0.3
+		eq[1] = 0.3
+		filter.Equalizer = &eq
+		filter.Timescale = &lavalink.Timescale{Pitch: 0.5}
+		filter.Tremolo = &lavalink.Tremolo{Depth: 0.3, Frequency: 14}
+	case "reset":
+		filter = lavalink.Filters{}
 	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{Timescale: k})); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
-		},
-	})
-}
-func ResetFilters(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 
 	if player == nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -549,7 +420,7 @@ func ResetFilters(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interacti
 			},
 		})
 	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(lavalink.Filters{})); err != nil {
+	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
 		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -560,48 +431,7 @@ func ResetFilters(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interacti
 	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
-		},
-	})
-}
-func Vaporewave(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
-	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
-
-	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
-			},
-		})
-	}
-	k := lavalink.Filters{}
-	var eq lavalink.Equalizer
-	eq[0] = 0.3
-	eq[1] = 0.3
-	if player.Filters().Timescale.Pitch != 0.5 ||
-		player.Filters().Tremolo.Depth != 0.3 ||
-		player.Filters().Tremolo.Frequency != 14 ||
-		player.Filters().Equalizer[1] != 0.3 ||
-		player.Filters().Equalizer[0] != 0.3 {
-		k = lavalink.Filters{
-			Equalizer: &eq,
-			Timescale: &lavalink.Timescale{Pitch: 0.5},
-			Tremolo:   &lavalink.Tremolo{Depth: 0.3, Frequency: 14},
-		}
-	}
-	if err := player.Update(context.TODO(), lavalink.WithFilters(k)); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
+			Embeds: []*discordgo.MessageEmbed{embedFilters(f)},
 		},
 	})
 }

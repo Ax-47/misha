@@ -52,6 +52,9 @@ func (c *Cmd) Bassbosts(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func (c *Cmd) Timescale(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	music.Timescale(c.Ex, s, i)
 }
-func (c *Cmd) Nightcore(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	music.Nightcore(c.Ex, s, i)
+func (c *Cmd) Filter(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Filter(c.Ex, s, i)
+}
+func (c *Cmd) Volume(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	music.Volume(c.Ex, s, i)
 }
