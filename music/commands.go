@@ -385,9 +385,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				c.Bot.Queues.Cache[i.GuildID] = playlist.Tracks[r].Info.Identifier
 			}, func(tracks []lavalink.Track) {
 			}, func() {},
-				func(err error) {
-					fmt.Println(err)
-				}))
+				func(err error) {}))
 	}
 	track, ok := queue.Next()
 	if !ok {
