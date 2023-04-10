@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"misha/cmd"
+	"misha/extensions"
 	"misha/lava"
 	"os"
 	"os/signal"
@@ -17,7 +17,7 @@ import (
 var (
 	s   *discordgo.Session
 	con *Config
-	c   cmd.Cmd
+	Ex  *extensions.Ex
 )
 
 func init() {
@@ -37,7 +37,8 @@ func init() {
 }
 
 func init() {
-	c.Init(con.Database.Url, con.Database.Database, con.Database.Collection, s, con.Lavalink.Name, con.Lavalink.Address, con.Lavalink.Password, con.Lavalink.Https)
+	Ex = &extensions.Ex{}
+	Ex.Init(con.Database.Url, con.Database.Database, con.Database.Collection, s, con.Lavalink.Name, con.Lavalink.Address, con.Lavalink.Password, con.Lavalink.Https)
 
 	s.AddHandler(Handlers)
 }
@@ -51,14 +52,14 @@ func main() {
 	})
 	s.State.TrackVoice = true
 	s.Identify.Intents = discordgo.IntentsAll
-	c.Ex.Bot.Queues = &lava.QueueManager{
+	Ex.Bot.Queues = &lava.QueueManager{
 		Queues:   make(map[string]*lava.Queue),
 		Autoplay: make(map[string]bool),
 		Cache:    make(map[string]string),
 	}
-	c.Ex.Bot.S = s
-	s.AddHandler(c.Ex.Bot.OnVoiceStateUpdate)
-	s.AddHandler(c.Ex.Bot.OnVoiceServerUpdate)
+	Ex.Bot.S = s
+	s.AddHandler(Ex.Bot.OnVoiceStateUpdate)
+	s.AddHandler(Ex.Bot.OnVoiceServerUpdate)
 	err := s.Open()
 	if err != nil {
 		log.Fatalf("Cannot open the session: %v", err)
@@ -75,14 +76,14 @@ func main() {
 	}
 
 	defer s.Close()
-	c.Ex.Bot.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnPlayerPause),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnPlayerResume),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackStart),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackEnd),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackException),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnTrackStuck),
-		disgolink.WithListenerFunc(c.Ex.Bot.OnWebSocketClosed),
+	Ex.Bot.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
+		disgolink.WithListenerFunc(Ex.Bot.OnPlayerPause),
+		disgolink.WithListenerFunc(Ex.Bot.OnPlayerResume),
+		disgolink.WithListenerFunc(Ex.Bot.OnTrackStart),
+		disgolink.WithListenerFunc(Ex.Bot.OnTrackEnd),
+		disgolink.WithListenerFunc(Ex.Bot.OnTrackException),
+		disgolink.WithListenerFunc(Ex.Bot.OnTrackStuck),
+		disgolink.WithListenerFunc(Ex.Bot.OnWebSocketClosed),
 	)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -92,7 +93,7 @@ func main() {
 		Password: con.Lavalink.Password,
 		Secure:   con.Lavalink.Https,
 	}
-	node, err := c.Ex.Bot.Lavalink.AddNode(ctx, nc)
+	node, err := Ex.Bot.Lavalink.AddNode(ctx, nc)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,7 +1,9 @@
 package main
 
 import (
-	"misha/cmd"
+	"misha/extensions"
+	"misha/music"
+	"misha/setup"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -287,51 +289,48 @@ var (
 	}
 )
 
-func ComponentsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"select": c.HelpComponent,
-		"re":     c.HandlerComponentsQueuePrevious,
-		"next":   c.HandlerComponentsQueueNext,
+func ComponentsHandlers_init() map[string]func(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return map[string]func(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate){
+		"select": setup.HelpComponent,
+		"re":     music.HandlerComponentsQueuePrevious,
+		"next":   music.HandlerComponentsQueueNext,
 	}
 }
-func CommandsHandlers_init(c cmd.Cmd) map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	return map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"help": c.Help,
-
+func CommandsHandlers_init() map[string]func(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	return map[string]func(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate){
+		"help": setup.Help,
 		//music commands
-		"play":        c.Play,
-		"pause":       c.Pause,
-		"now-playing": c.NowPlaying,
-		"stop":        c.Stop,
-		"queue":       c.Queue,
-		"clear-queue": c.ClearQueue,
-		"loop":        c.QueueType,
-		"shuffle":     c.Shuffle,
-		"skip":        c.Skip,
-		"seek":        c.Seek,
-		"swap":        c.Swap,
-		"remove":      c.Remove,
-		"auto-play":   c.Autoplay,
-		// in the future
-		// filter
-		"equalizer": c.Bassbosts,
-		"timescale": c.Timescale,
-		"tremolo":   c.Tremolo,
-		"filter":    c.Filter,
-		"volume":    c.Volume,
+		"play":        music.Play,
+		"pause":       music.Pause,
+		"now-playing": music.NowPlaying,
+		"stop":        music.Stop,
+		"queue":       music.Queue,
+		"clear-queue": music.ClearQueue,
+		"loop":        music.QueueType,
+		"shuffle":     music.Shuffle,
+		"skip":        music.Skip,
+		"seek":        music.Seek,
+		"swap":        music.Swap,
+		"remove":      music.Remove,
+		"auto-play":   music.Autoplay,
+		"equalizer":   music.Bassboost,
+		"timescale":   music.Timescale,
+		"tremolo":     music.Tremolo,
+		"filter":      music.Filter,
+		"volume":      music.Volume,
 	}
 }
 
 func Handlers(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	switch i.Type {
 	case discordgo.InteractionApplicationCommand:
-		if h, ok := CommandsHandlers_init(c)[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
+		if h, ok := CommandsHandlers_init()[i.ApplicationCommandData().Name]; ok {
+			h(Ex, s, i)
 		}
 	case discordgo.InteractionMessageComponent:
 
-		if h, ok := ComponentsHandlers_init(c)[i.MessageComponentData().CustomID]; ok {
-			h(s, i)
+		if h, ok := ComponentsHandlers_init()[i.MessageComponentData().CustomID]; ok {
+			h(Ex, s, i)
 		}
 	}
 }

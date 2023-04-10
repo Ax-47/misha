@@ -17,9 +17,9 @@ func GuildCreate(c *extensions.Ex, s *discordgo.Session, e *discordgo.Event) {
 	buf, _ := e.RawData.MarshalJSON()
 	json.Unmarshal(buf, res)
 	var result models.GuildDoc
-	err := c.DB.Coll["guilds"].FindOne(context.TODO(), bson.M{"GuildID": res.Guild.ID}).Decode(&result)
+	err := c.DB.Colls["guilds"].FindOne(context.TODO(), bson.M{"GuildID": res.Guild.ID}).Decode(&result)
 	if err != nil {
-		c.DB.Coll["guilds"].InsertOne(context.TODO(), bson.M{"GuildID": res.Guild.ID})
+		c.DB.Colls["guilds"].InsertOne(context.TODO(), bson.M{"GuildID": res.Guild.ID})
 	}
 
 }

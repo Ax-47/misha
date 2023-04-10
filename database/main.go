@@ -9,15 +9,19 @@ import (
 
 type Database struct {
 	Client *mongo.Client
-	Coll   map[string]*mongo.Collection
+	Colls  map[string]*mongo.Collection
 }
 
+func Get() *Database {
+	db := &Database{}
+	return db
+}
 func (db *Database) Init(uri, database string, colls []string) error {
 	var err error
-	db.Coll = make(map[string]*mongo.Collection)
+	db.Colls = make(map[string]*mongo.Collection)
 	db.Client, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	for _, coll := range colls {
-		db.Coll[coll] = db.Client.Database(database).Collection(coll)
+		db.Colls[coll] = db.Client.Database(database).Collection(coll)
 	}
 
 	return err

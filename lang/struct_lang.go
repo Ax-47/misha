@@ -38,6 +38,7 @@ type Lang struct {
 			NotFoundTrackPlaying  string
 			UserWasNotJoin        string
 			QueueLessThanTwo      string
+			UserNotInTheRoom      string
 		}
 		PlayTrack    string
 		PlayPlaylist string

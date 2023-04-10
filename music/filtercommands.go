@@ -9,17 +9,18 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
-func Bassbost(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func Bassboost(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	identifier := i.ApplicationCommandData().Options[0].StringValue()
 
 	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
+		return
 	}
 	var eq lavalink.Equalizer
 	filter := player.Filters()
@@ -213,161 +214,174 @@ func Bassbost(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 	}
 	filter.Equalizer = &eq
 	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
+		return
 	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{embedEqualizer(identifier)},
 		},
 	})
 }
-func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func Timescale(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 
 	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
+		return
 	}
 
 	filter := player.Filters()
 	filter.Timescale = &lavalink.Timescale{}
-	filter.Timescale.Speed = i.ApplicationCommandData().Options[0].FloatValue()
+	filter.Timescale.Speed = float64(i.ApplicationCommandData().Options[0].IntValue()) * 0.1
 	if filter.Timescale.Speed <= 0 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "speed")},
 			},
 		})
+		return
 	}
-	filter.Timescale.Pitch = i.ApplicationCommandData().Options[1].FloatValue()
+	filter.Timescale.Pitch = float64(i.ApplicationCommandData().Options[1].IntValue()) * 0.1
 	if filter.Timescale.Pitch <= 0 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "pitch")},
 			},
 		})
+		return
 	}
-	filter.Timescale.Rate = i.ApplicationCommandData().Options[2].FloatValue()
+	filter.Timescale.Rate = float64(i.ApplicationCommandData().Options[2].IntValue()) * 0.1
 	if filter.Timescale.Rate <= 0 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "rate")},
 			},
 		})
+		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
+		return
 	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
+			Embeds: []*discordgo.MessageEmbed{embedTimescale(filter.Timescale.Speed, filter.Timescale.Pitch, filter.Timescale.Rate)},
 		},
 	})
 }
-func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
+		return
 	}
 	var t lavalink.Tremolo
 	filter := player.Filters()
 	filter.Tremolo = &lavalink.Tremolo{}
-	filter.Tremolo.Frequency = float32(i.ApplicationCommandData().Options[0].FloatValue())
+	filter.Tremolo.Frequency = float32(i.ApplicationCommandData().Options[0].IntValue()) * 0.1
 	if t.Frequency < 0 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "Frequency")},
 			},
 		})
+		return
 	}
-	filter.Tremolo.Depth = float32(i.ApplicationCommandData().Options[1].FloatValue())
+	filter.Tremolo.Depth = float32(i.ApplicationCommandData().Options[1].FloatValue()) * 0.1
 	if t.Depth < 0 || t.Depth >= 1 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedTimescaleErrorInput(c.Lang(i.Locale.String()), "Depth")},
 			},
 		})
+		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
+		return
 	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
+			Embeds: []*discordgo.MessageEmbed{embedTremolo(filter.Tremolo.Frequency, filter.Tremolo.Depth)},
 		},
 	})
 }
-func Volume(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func Volume(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
+		return
 	}
 
 	volume := int(i.ApplicationCommandData().Options[0].IntValue())
 	if volume <= 0 || volume > 500 {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{},
 			},
 		})
+		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithVolume(volume)); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
+		return
 	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{},
+			Embeds: []*discordgo.MessageEmbed{embedVolume(volume)},
 		},
 	})
 
 }
 
-func Filter(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) error {
+func Filter(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	filter := player.Filters()
 	var eq lavalink.Equalizer
@@ -417,22 +431,24 @@ func Filter(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 	}
 
 	if player == nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
 			},
 		})
+		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithFilters(filter)); err != nil {
-		return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Embeds: []*discordgo.MessageEmbed{embedError(err)},
 			},
 		})
+		return
 	}
-	return s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Embeds: []*discordgo.MessageEmbed{embedFilters(f)},

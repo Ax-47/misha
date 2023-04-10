@@ -104,6 +104,12 @@ func embedError(err error) *discordgo.MessageEmbed {
 		Description: err.Error(),
 	}
 }
+func embedUser(l languages.Lang) *discordgo.MessageEmbed {
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.Errors.UserNotInTheRoom,
+	}
+}
 func embedErrorLavalink() *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
@@ -253,5 +259,26 @@ func embedFilters(filter string) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
 		Title: fmt.Sprintf("Filter: `%s`", filter),
+	}
+}
+func embedVolume(Volume int) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf("Volume: `%d`", Volume),
+	}
+}
+func embedTremolo(Frequency, Depth float32) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf("Frequency:`%.1f`,Depth: `%.1f`", Depth, Frequency),
+	}
+}
+func embedTimescale(Speed, Pitch, Rate float64) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: fmt.Sprintf("Speed:`%.1f`,Pitch: `%.1f`,Rate: `%.1f`", Speed, Pitch, Rate),
 	}
 }

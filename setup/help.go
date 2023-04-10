@@ -91,7 +91,7 @@ func Help(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 
 }
 
-func Help_Component(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+func HelpComponent(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	var Embeds *discordgo.MessageEmbed
 
 	data := i.MessageComponentData()

@@ -11,28 +11,37 @@ import (
 
 type Ex struct {
 	languages map[string]l.Lang
-	DB        d.Database
+	DB        *d.Database
 	Bot       lava.Bot
 }
 
 func (c *Ex) Init(url, database string, colls []string, s *discordgo.Session, name, address, password string, https bool) error {
-	var err error
-	c.DB = d.Database{}
-	err = c.DB.Init(url, database, colls)
-	if err != nil {
-		return err
-	}
+	var (
+		err error
+		con chan error
+	)
+	con = make(chan error)
+	db := d.Database{}
+	c.DB = &db
+	go func(con chan error) {
+		err = c.DB.Init(url, database, colls)
+		if err != nil {
+			con <- err
+			return
+		}
+		con <- nil
 
-	if err != nil {
-		return err
-	}
+	}(con)
+	c.languages = make(map[string]l.Lang, 4)
 
-	if err != nil {
-		return err
-	}
 	c.languages, err = l.Lang_init()
-	return err
+	if err != nil {
+		return err
+	} else if err = <-con; err != nil {
+		return err
+	}
 
+	return nil
 }
 func (c *Ex) Lang(lang string) l.Lang {
 	switch lang {

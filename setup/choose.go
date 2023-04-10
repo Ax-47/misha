@@ -28,5 +28,5 @@ func SetupChoose(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interactio
 	if err != nil {
 		panic(err)
 	}
-	c.DB.Coll["guilds"].UpdateOne(context.TODO(), bson.M{"GuildID": i.GuildID}, bson.M{"$set": bson.M{"Choose.MassageID": M.ID}})
+	c.DB.Colls["guilds"].UpdateOne(context.TODO(), bson.M{"GuildID": i.GuildID}, bson.M{"$set": bson.M{"Choose.MassageID": M.ID}})
 }
