@@ -314,7 +314,7 @@ func Tremolo(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 		})
 		return
 	}
-	filter.Tremolo.Depth = float32(i.ApplicationCommandData().Options[1].FloatValue()) * 0.1
+	filter.Tremolo.Depth = float32(i.ApplicationCommandData().Options[1].IntValue()) * 0.1
 	if t.Depth < 0 || t.Depth >= 1 {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

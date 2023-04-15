@@ -104,4 +104,5 @@ func (q *QueueManager) Get(guildID string) *Queue {
 
 func (q *QueueManager) Delete(guildID string) {
 	delete(q.Queues, guildID)
+	delete(q.Cache, guildID)
 }

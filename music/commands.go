@@ -20,12 +20,13 @@ var (
 )
 
 func Shuffle(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	queue := c.Bot.Queues.Get(i.GuildID)
 	if queue == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -35,20 +36,21 @@ func Shuffle(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCre
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedShifle(c.Lang(i.Locale.String()))},
+			Embeds: []*discordgo.MessageEmbed{embedShifle(langCode)},
 		},
 	})
 
 }
 
 func QueueType(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	data := i.ApplicationCommandData()
 	queue := c.Bot.Queues.Get(i.GuildID)
 	if queue == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -58,19 +60,21 @@ func QueueType(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionC
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedLoop(c.Lang(i.Locale.String()), queue.Type.String())},
+			Embeds: []*discordgo.MessageEmbed{embedLoop(langCode, queue.Type.String())},
 		},
 	})
 
 }
 
 func ClearQueue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+
+	langCode := c.Lang(i.Locale.String())
 	queue := c.Bot.Queues.Get(i.GuildID)
 	if queue == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -80,19 +84,20 @@ func ClearQueue(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedClearQueue(c.Lang(i.Locale.String()))},
+			Embeds: []*discordgo.MessageEmbed{embedClearQueue(langCode)},
 		},
 	})
 
 }
 
 func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	queue := c.Bot.Queues.Get(i.GuildID)
 	if queue == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -102,7 +107,7 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(langCode)},
 			},
 		})
 		return
@@ -111,7 +116,7 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedQueue(c.Lang(i.Locale.String()), 1, queue, i.Member.User.ID)},
+			Embeds: []*discordgo.MessageEmbed{embedQueue(langCode, 1, queue, i.Member.User.ID)},
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
@@ -135,12 +140,13 @@ func Queue(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 }
 
 func Pause(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -164,19 +170,20 @@ func Pause(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreat
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedPause(c.Lang(i.Locale.String()), status)},
+			Embeds: []*discordgo.MessageEmbed{embedPause(langCode, status)},
 		},
 	})
 
 }
 
 func Stop(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -195,19 +202,20 @@ func Stop(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedStop(c.Lang(i.Locale.String()))},
+			Embeds: []*discordgo.MessageEmbed{embedStop(langCode)},
 		},
 	})
 
 }
 
 func NowPlaying(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	if player == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -218,7 +226,7 @@ func NowPlaying(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedNotFoundTrackPlaying(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedNotFoundTrackPlaying(langCode)},
 			},
 		})
 		return
@@ -227,7 +235,7 @@ func NowPlaying(c *extensions.Ex, s *discordgo.Session, i *discordgo.Interaction
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedNow(c.Lang(i.Locale.String()), *track, player)},
+			Embeds: []*discordgo.MessageEmbed{embedNow(langCode, *track, player)},
 		},
 	})
 
@@ -241,54 +249,55 @@ func FormatPosition(position lavalink.Duration) string {
 }
 
 func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	data := i.ApplicationCommandData()
 	identifier := data.Options[0].StringValue()
 	if !urlPattern.MatchString(identifier) {
 		identifier = lavalink.SearchTypeYoutube.Apply(identifier)
 	}
-	bot, _ := s.State.VoiceState(i.GuildID, s.State.User.ID)
+	var err error
+
+	botr := make(chan *discordgo.VoiceState)
+	go func(bots chan *discordgo.VoiceState) {
+		sbot, _ := s.State.VoiceState(i.GuildID, s.State.User.ID)
+		bots <- sbot
+	}(botr)
+
 	voiceState, err := s.State.VoiceState(i.GuildID, i.Member.User.ID)
-	if bot != nil {
-		if bot != voiceState {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{embedUser(c.Lang(i.Locale.String()))},
-				},
-			})
-			return
-		}
-	}
-	switch err {
-	default:
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-		return
-	case discordgo.ErrStateNotFound:
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedJoin(c.Lang(i.Locale.String()))},
-			},
-		})
-		return
-
-	case nil:
-	}
-
-	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
-	}); err != nil {
+	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseDeferredChannelMessageWithSource}); err != nil {
 		return
 	}
 	if c.Bot.Lavalink == nil {
 		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 			Embeds: &[]*discordgo.MessageEmbed{embedErrorLavalink()},
 		})
+		return
+	}
+	switch err {
+	default:
+		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+		})
+		return
+	case discordgo.ErrStateNotFound:
+		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Embeds: &[]*discordgo.MessageEmbed{embedJoin(langCode)},
+		})
+		return
+
+	case nil:
+	}
+
+	bot := <-botr
+	if bot != nil {
+		if bot.ChannelID != voiceState.ChannelID {
+			fmt.Println(bot.ChannelID, " ", voiceState.ChannelID)
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedUser(langCode)},
+			},
+			)
+			return
+		}
 	}
 	player := c.Bot.Lavalink.Player(snowflake.MustParse(i.GuildID))
 	queue := c.Bot.Queues.Get(i.GuildID)
@@ -297,53 +306,56 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	defer cancel()
 
 	var toPlay *lavalink.Track
-	c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
-		func(track lavalink.Track) {
-			go s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(c.Lang(i.Locale.String()), track)},
-			})
-			c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
-			if player.Track() == nil {
-				toPlay = &track
-			} else {
 
-				queue.Add(track)
-			}
-		},
-		func(playlist lavalink.Playlist) {
-			go s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(c.Lang(i.Locale.String()), playlist, identifier)},
-			})
-			if player.Track() == nil {
-				toPlay = &playlist.Tracks[0]
-				queue.Add(playlist.Tracks[1:]...)
-			} else {
-				queue.Add(playlist.Tracks...)
-			}
-		},
-		func(tracks []lavalink.Track) {
-			go s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(c.Lang(i.Locale.String()), tracks[0])},
-			})
-			c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
-			if player.Track() == nil {
-				toPlay = &tracks[0]
-			} else {
-				queue.Add(tracks[0])
+	go func() {
+		c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
+			func(track lavalink.Track) {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, track)},
+				})
+				c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
+				if player.Track() == nil {
+					toPlay = &track
+				} else {
 
-			}
-		},
-		func() {
-			go s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(c.Lang(i.Locale.String()))},
-			})
-		},
-		func(err error) {
-			go s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
-			})
-		},
-	))
+					queue.Add(track)
+				}
+			},
+			func(playlist lavalink.Playlist) {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(langCode, playlist, identifier)},
+				})
+				if player.Track() == nil {
+					toPlay = &playlist.Tracks[0]
+					queue.Add(playlist.Tracks[1:]...)
+				} else {
+					queue.Add(playlist.Tracks...)
+				}
+			},
+			func(tracks []lavalink.Track) {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, tracks[0])},
+				})
+				c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
+				if player.Track() == nil {
+					toPlay = &tracks[0]
+				} else {
+					queue.Add(tracks[0])
+
+				}
+			},
+			func() {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+				})
+			},
+			func(err error) {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+				})
+			},
+		))
+	}()
 	if toPlay == nil {
 		return
 	}
@@ -359,13 +371,14 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 
 }
 func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	queue := c.Bot.Queues.Get(i.GuildID)
 	if player == nil || queue == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -389,16 +402,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	}
 	track, ok := queue.Next()
 	if !ok {
-		if err := s.ChannelVoiceJoinManual(i.GuildID, "", false, false); err != nil {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{embedError(err)},
-				},
-			})
-			return
-		}
-
+		s.ChannelVoiceJoinManual(i.GuildID, "", false, false)
 	}
 
 	if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
@@ -414,12 +418,13 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedSkip(c.Lang(i.Locale.String()))},
+			Embeds: []*discordgo.MessageEmbed{embedSkip(langCode)},
 		},
 	})
 
 }
 func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	data := i.ApplicationCommandData()
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	identifier := data.Options[0].IntValue()
@@ -428,7 +433,7 @@ func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -447,12 +452,13 @@ func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedSeek(c.Lang(i.Locale.String()), FormatPosition(duration))},
+			Embeds: []*discordgo.MessageEmbed{embedSeek(langCode, FormatPosition(duration))},
 		},
 	})
 
 }
 func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	data := i.ApplicationCommandData()
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	identifier := data.Options[0].IntValue()
@@ -461,7 +467,7 @@ func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -470,7 +476,7 @@ func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(langCode)},
 			},
 		})
 		return
@@ -481,12 +487,13 @@ func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedRemove(c.Lang(i.Locale.String()), song)},
+			Embeds: []*discordgo.MessageEmbed{embedRemove(langCode, song)},
 		},
 	})
 
 }
 func Swap(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	data := i.ApplicationCommandData()
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	adress1 := data.Options[0].IntValue()
@@ -496,7 +503,7 @@ func Swap(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -505,7 +512,7 @@ func Swap(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedTracksInQueueNotFound(langCode)},
 			},
 		})
 		return
@@ -515,7 +522,7 @@ func Swap(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedQueueLessThanTwo(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedQueueLessThanTwo(langCode)},
 			},
 		})
 		return
@@ -527,19 +534,20 @@ func Swap(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedSwap(c.Lang(i.Locale.String()), song1, song2)},
+			Embeds: []*discordgo.MessageEmbed{embedSwap(langCode, song1, song2)},
 		},
 	})
 
 }
 func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
+	langCode := c.Lang(i.Locale.String())
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	autoplay := c.Bot.Queues.GetAuto(i.GuildID)
 	if player == nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(c.Lang(i.Locale.String()))},
+				Embeds: []*discordgo.MessageEmbed{embedPlayerNotFound(langCode)},
 			},
 		})
 		return
@@ -548,7 +556,7 @@ func Autoplay(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCr
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedAutoPlay(c.Lang(i.Locale.String()), !autoplay)},
+			Embeds: []*discordgo.MessageEmbed{embedAutoPlay(langCode, !autoplay)},
 		},
 	})
 

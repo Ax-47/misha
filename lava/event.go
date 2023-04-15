@@ -20,6 +20,7 @@ func (b *Bot) OnVoiceStateUpdate(session *discordgo.Session, event *discordgo.Vo
 	b.Lavalink.OnVoiceStateUpdate(context.TODO(), snowflake.MustParse(event.GuildID), channelID, event.SessionID)
 	if event.ChannelID == "" {
 		b.Queues.Delete(event.GuildID)
+		b.Queues.Autoplay[event.GuildID] = false
 	}
 }
 
