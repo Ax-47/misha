@@ -39,16 +39,15 @@ func init() {
 func init() {
 	Ex = &extensions.Ex{}
 	Ex.Init(con.Database.Url, con.Database.Database, con.Database.Collection, s, con.Lavalink.Name, con.Lavalink.Address, con.Lavalink.Password, con.Lavalink.Https)
-
 	s.AddHandler(Handlers)
-}
-func init() {
 	s.AddHandler(EventHandler)
 }
 
 func main() {
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
+		log.Printf("Author :%v", con.Info.Author)
+		log.Printf("Version :%v", con.Info.Version)
 	})
 	s.State.TrackVoice = true
 	s.Identify.Intents = discordgo.IntentsAll
@@ -77,13 +76,9 @@ func main() {
 
 	defer s.Close()
 	Ex.Bot.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
-		disgolink.WithListenerFunc(Ex.Bot.OnPlayerPause),
-		disgolink.WithListenerFunc(Ex.Bot.OnPlayerResume),
-		disgolink.WithListenerFunc(Ex.Bot.OnTrackStart),
+
 		disgolink.WithListenerFunc(Ex.Bot.OnTrackEnd),
 		disgolink.WithListenerFunc(Ex.Bot.OnTrackException),
-		disgolink.WithListenerFunc(Ex.Bot.OnTrackStuck),
-		disgolink.WithListenerFunc(Ex.Bot.OnWebSocketClosed),
 	)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()

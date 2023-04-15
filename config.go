@@ -8,6 +8,10 @@ import (
 )
 
 type Config struct {
+	Info struct {
+		Author  string
+		Version string
+	}
 	Discord struct {
 		Token string `yaml:"token"`
 		Guild string `yaml:"guild"`
