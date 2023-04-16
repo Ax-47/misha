@@ -40,12 +40,12 @@ filters
 
 volume
 
-## note patch next update 
+## note patch next update
 
 spotify
 
-## big update 
+## big update
 
-setup commands 
+setup commands
 
 web custom choose command
