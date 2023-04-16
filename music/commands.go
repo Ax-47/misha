@@ -388,7 +388,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 
 		cache := c.Bot.Queues.Cache[i.GuildID]
 		cha := false
-		fmt.Println("pass1")
+
 		for {
 			if cha {
 				break
@@ -398,25 +398,24 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache),
 				disgolink.NewResultHandler(func(track lavalink.Track) {
 					cache = "gykWYPrArbY"
-					fmt.Println("pass1")
+
 				}, func(playlist lavalink.Playlist) {
 					queue.Add(playlist.Tracks[r])
 					cache = playlist.Tracks[r].Info.Identifier
 					cha = true
-					fmt.Println("pass2")
+
 				}, func(tracks []lavalink.Track) {
 				}, func() {
 					cache = "gykWYPrArbY"
-					fmt.Println("pass3")
+
 				}, func(err error) {
 					cache = "gykWYPrArbY"
-					fmt.Println("pass1", err)
+
 				}))
 
 		}
 		c.Bot.Queues.Cache[i.GuildID] = cache
 	}
-	fmt.Println("pass2")
 	track, ok := queue.Next()
 
 	if !ok {
@@ -433,7 +432,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			return
 		}
 	}
-	fmt.Println("pass3")
+
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
