@@ -384,7 +384,7 @@ func Volume(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 func Filter(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	player := c.Bot.Lavalink.ExistingPlayer(snowflake.MustParse(i.GuildID))
 	filter := player.Filters()
-	var eq lavalink.Equalizer
+
 	f := i.ApplicationCommandData().Options[0].StringValue()
 	switch f {
 	case "karaoke":
@@ -419,13 +419,6 @@ func Filter(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 			Pitch: 1.2450,
 			Rate:  1.9210,
 		}
-	case "vaporewave":
-
-		eq[0] = 0.3
-		eq[1] = 0.3
-		filter.Equalizer = &eq
-		filter.Timescale = &lavalink.Timescale{Pitch: 0.5}
-		filter.Tremolo = &lavalink.Tremolo{Depth: 0.3, Frequency: 14}
 	case "reset":
 		filter = lavalink.Filters{}
 	}

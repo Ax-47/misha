@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"misha/extensions"
 	"misha/lava"
@@ -20,6 +21,9 @@ var (
 	Ex  *extensions.Ex
 )
 
+func init() {
+	fmt.Print("\033[32m")
+}
 func init() {
 	var err error
 	con, err = Config_init()
@@ -46,17 +50,40 @@ func init() {
 func main() {
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
-		log.Printf("Author :%v", con.Info.Author)
-		log.Printf("Version :%v", con.Info.Version)
+		log.Printf("Author: %v", con.Info.Author)
+		log.Printf("Version: %v", con.Info.Version)
+		s.State.TrackVoice = true
+		s.Identify.Intents = discordgo.IntentsAll
+		Ex.Bot.Queues = &lava.QueueManager{
+			Queues:   make(map[string]*lava.Queue),
+			Autoplay: make(map[string]bool),
+			Cache:    make(map[string]string),
+		}
+		Ex.Bot.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
+
+			disgolink.WithListenerFunc(Ex.Bot.OnTrackEnd),
+			disgolink.WithListenerFunc(Ex.Bot.OnTrackException),
+		)
+		Ex.Bot.S = s
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		nc := disgolink.NodeConfig{
+			Name:     con.Lavalink.Name,
+			Address:  con.Lavalink.Address,
+			Password: con.Lavalink.Password,
+			Secure:   con.Lavalink.Https,
+		}
+		node, err := Ex.Bot.Lavalink.AddNode(ctx, nc)
+		if err != nil {
+			log.Fatal(err)
+		}
+		version, err := node.Version(ctx)
+		if err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("node version: %s", version)
 	})
-	s.State.TrackVoice = true
-	s.Identify.Intents = discordgo.IntentsAll
-	Ex.Bot.Queues = &lava.QueueManager{
-		Queues:   make(map[string]*lava.Queue),
-		Autoplay: make(map[string]bool),
-		Cache:    make(map[string]string),
-	}
-	Ex.Bot.S = s
+
 	s.AddHandler(Ex.Bot.OnVoiceStateUpdate)
 	s.AddHandler(Ex.Bot.OnVoiceServerUpdate)
 	err := s.Open()
@@ -75,28 +102,6 @@ func main() {
 	}
 
 	defer s.Close()
-	Ex.Bot.Lavalink = disgolink.New(snowflake.MustParse(s.State.User.ID),
-
-		disgolink.WithListenerFunc(Ex.Bot.OnTrackEnd),
-		disgolink.WithListenerFunc(Ex.Bot.OnTrackException),
-	)
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	nc := disgolink.NodeConfig{
-		Name:     con.Lavalink.Name,
-		Address:  con.Lavalink.Address,
-		Password: con.Lavalink.Password,
-		Secure:   con.Lavalink.Https,
-	}
-	node, err := Ex.Bot.Lavalink.AddNode(ctx, nc)
-	if err != nil {
-		log.Fatal(err)
-	}
-	version, err := node.Version(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("node version: %s", version)
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)

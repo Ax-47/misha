@@ -190,10 +190,7 @@ var (
 							Name:  "Superfast",
 							Value: "superfast",
 						},
-						{
-							Name:  "Vaporewave",
-							Value: "vaporewave",
-						},
+
 						{
 							Name:  "Reset",
 							Value: "reset",

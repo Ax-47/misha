@@ -291,7 +291,6 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	bot := <-botr
 	if bot != nil {
 		if bot.ChannelID != voiceState.ChannelID {
-			fmt.Println(bot.ChannelID, " ", voiceState.ChannelID)
 			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Embeds: &[]*discordgo.MessageEmbed{embedUser(langCode)},
 			},
@@ -307,55 +306,54 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 
 	var toPlay *lavalink.Track
 
-	go func() {
-		c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
-			func(track lavalink.Track) {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, track)},
-				})
-				c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
-				if player.Track() == nil {
-					toPlay = &track
-				} else {
+	c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
+		func(track lavalink.Track) {
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, track)},
+			})
+			c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
+			if player.Track() == nil {
+				toPlay = &track
+			} else {
 
-					queue.Add(track)
-				}
-			},
-			func(playlist lavalink.Playlist) {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(langCode, playlist, identifier)},
-				})
-				if player.Track() == nil {
-					toPlay = &playlist.Tracks[0]
-					queue.Add(playlist.Tracks[1:]...)
-				} else {
-					queue.Add(playlist.Tracks...)
-				}
-			},
-			func(tracks []lavalink.Track) {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, tracks[0])},
-				})
-				c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
-				if player.Track() == nil {
-					toPlay = &tracks[0]
-				} else {
-					queue.Add(tracks[0])
+				queue.Add(track)
+			}
+		},
+		func(playlist lavalink.Playlist) {
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(langCode, playlist, identifier)},
+			})
+			if player.Track() == nil {
+				toPlay = &playlist.Tracks[0]
+				queue.Add(playlist.Tracks[1:]...)
+			} else {
+				queue.Add(playlist.Tracks...)
+			}
+		},
+		func(tracks []lavalink.Track) {
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, tracks[0])},
+			})
+			c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
+			if player.Track() == nil {
+				toPlay = &tracks[0]
+			} else {
+				queue.Add(tracks[0])
 
-				}
-			},
-			func() {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
-				})
-			},
-			func(err error) {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
-				})
-			},
-		))
-	}()
+			}
+		},
+		func() {
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+			})
+		},
+		func(err error) {
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+			})
+		},
+	))
+
 	if toPlay == nil {
 		return
 	}
@@ -389,32 +387,53 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		defer cancel()
 
 		cache := c.Bot.Queues.Cache[i.GuildID]
+		cha := false
+		fmt.Println("pass1")
+		for {
+			if cha {
+				break
+			}
 
-		c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx,
-			fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache),
-			disgolink.NewResultHandler(func(track lavalink.Track) {
-			}, func(playlist lavalink.Playlist) {
-				queue.Add(playlist.Tracks[r])
-				c.Bot.Queues.Cache[i.GuildID] = playlist.Tracks[r].Info.Identifier
-			}, func(tracks []lavalink.Track) {
-			}, func() {},
-				func(err error) {}))
+			c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx,
+				fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache),
+				disgolink.NewResultHandler(func(track lavalink.Track) {
+					cache = "gykWYPrArbY"
+					fmt.Println("pass1")
+				}, func(playlist lavalink.Playlist) {
+					queue.Add(playlist.Tracks[r])
+					cache = playlist.Tracks[r].Info.Identifier
+					cha = true
+					fmt.Println("pass2")
+				}, func(tracks []lavalink.Track) {
+				}, func() {
+					cache = "gykWYPrArbY"
+					fmt.Println("pass3")
+				}, func(err error) {
+					cache = "gykWYPrArbY"
+					fmt.Println("pass1", err)
+				}))
+
+		}
+		c.Bot.Queues.Cache[i.GuildID] = cache
 	}
+	fmt.Println("pass2")
 	track, ok := queue.Next()
+
 	if !ok {
-		s.ChannelVoiceJoinManual(i.GuildID, "", false, false)
-	}
+		s.ChannelVoiceJoinManual(i.GuildID, " ", false, false)
+	} else {
 
-	if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Embeds: []*discordgo.MessageEmbed{embedError(err)},
-			},
-		})
-		return
+		if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Embeds: []*discordgo.MessageEmbed{embedError(err)},
+				},
+			})
+			return
+		}
 	}
-
+	fmt.Println("pass3")
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
