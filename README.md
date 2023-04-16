@@ -39,3 +39,13 @@ timescale
 filters
 
 volume
+
+## note patch next update 
+
+spotify
+
+## big update 
+
+setup commands 
+
+web custom choose command

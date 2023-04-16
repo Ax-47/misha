@@ -206,7 +206,7 @@ func embedSwap(l languages.Lang, song1, song2 string) *discordgo.MessageEmbed {
 func embedRemove(l languages.Lang, title string) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
-		Title: fmt.Sprintf(l.MusicCommands.Seek, title),
+		Title: fmt.Sprintf(l.MusicCommands.Remove, title),
 	}
 }
 func embedAutoPlay(l languages.Lang, on bool) *discordgo.MessageEmbed {

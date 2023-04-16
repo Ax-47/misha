@@ -501,7 +501,7 @@ func Remove(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCrea
 
 	}
 	song := queue.Tracks[identifier-1].Info.Title
-	queue.Delete(int(identifier))
+	queue.Delete(int(identifier - 1))
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
