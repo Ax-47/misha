@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"fmt"
@@ -27,6 +27,9 @@ type Config struct {
 		Address  string `yaml:"address"`
 		Password string `yaml:"password"`
 		Https    bool   `yaml:"https"`
+	}
+	Spotify struct {
+		Client, Secret string
 	}
 }
 

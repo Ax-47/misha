@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"misha/config"
 	"misha/extensions"
 	"misha/lava"
 	"os"
@@ -17,7 +18,7 @@ import (
 
 var (
 	s   *discordgo.Session
-	con *Config
+	con *config.Config
 	Ex  *extensions.Ex
 )
 
@@ -26,7 +27,7 @@ func init() {
 }
 func init() {
 	var err error
-	con, err = Config_init()
+	con, err = config.Config_init()
 	if err != nil {
 		log.Fatalf("Invalid Config: %v", err)
 	}
@@ -42,16 +43,18 @@ func init() {
 
 func init() {
 	Ex = &extensions.Ex{}
-	Ex.Init(con.Database.Url, con.Database.Database, con.Database.Collection, s, con.Lavalink.Name, con.Lavalink.Address, con.Lavalink.Password, con.Lavalink.Https)
+	Ex.Init(con)
 	s.AddHandler(Handlers)
 	s.AddHandler(EventHandler)
 }
 
 func main() {
+
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 		log.Printf("Author: %v", con.Info.Author)
 		log.Printf("Version: %v", con.Info.Version)
+
 		s.State.TrackVoice = true
 		s.Identify.Intents = discordgo.IntentsAll
 		Ex.Bot.Queues = &lava.QueueManager{

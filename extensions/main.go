@@ -1,21 +1,22 @@
 package extensions
 
 import (
+	"misha/config"
 	d "misha/database"
 	l "misha/lang"
-
 	"misha/lava"
 
-	"github.com/bwmarrin/discordgo"
+	"github.com/zmb3/spotify/v2"
 )
 
 type Ex struct {
 	languages map[string]l.Lang
 	DB        *d.Database
 	Bot       lava.Bot
+	Spotify   *spotify.Client
 }
 
-func (c *Ex) Init(url, database string, colls []string, s *discordgo.Session, name, address, password string, https bool) error {
+func (c *Ex) Init(configed *config.Config) error {
 	var (
 		err error
 		con chan error
@@ -24,7 +25,7 @@ func (c *Ex) Init(url, database string, colls []string, s *discordgo.Session, na
 	db := d.Database{}
 	c.DB = &db
 	go func(con chan error) {
-		err = c.DB.Init(url, database, colls)
+		err = c.DB.Init(configed.Database.Url, configed.Database.Database, configed.Database.Collection)
 		if err != nil {
 			con <- err
 			return
@@ -33,7 +34,7 @@ func (c *Ex) Init(url, database string, colls []string, s *discordgo.Session, na
 
 	}(con)
 	c.languages = make(map[string]l.Lang, 4)
-
+	c.Spotify = Auth(configed.Spotify.Client, configed.Spotify.Secret)
 	c.languages, err = l.Lang_init()
 	if err != nil {
 		return err

@@ -7,16 +7,19 @@ import (
 	"misha/extensions"
 	"misha/lava"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
 	"github.com/disgoorg/snowflake/v2"
+	"github.com/zmb3/spotify/v2"
 )
 
 var (
 	urlPattern = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
+	spotifyURL = regexp.MustCompile("https?://open.spotify.com/(?P<type>album|playlist|track|artist)/(?P<id>[a-zA-Z0-9]+)")
 )
 
 func Shuffle(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
@@ -305,54 +308,151 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	defer cancel()
 
 	var toPlay *lavalink.Track
+	identifierMap := []string{}
+	is_spotify := false
+	if spotifyURL.MatchString(identifier) {
+		is_spotify = true
+		//album|playlist|track|artist
+		ctx := context.Background()
 
-	c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, identifier, disgolink.NewResultHandler(
-		func(track lavalink.Track) {
+		if strings.Contains(identifier, "track") {
+			results, err := c.Spotify.GetTrack(ctx, spotify.ID(strings.Split(identifier, "https://open.spotify.com/track/")[1]))
+			if err != nil {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+				})
+				return
+			}
+			identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(results.ExternalIDs["isrc"]))
 			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, track)},
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrackSpotify(langCode, results)},
 			})
-			c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
-			if player.Track() == nil {
-				toPlay = &track
-			} else {
+		} else if strings.Contains(identifier, "playlist") {
 
-				queue.Add(track)
+			results, err := c.Spotify.GetPlaylist(ctx, spotify.ID(strings.Split(identifier, "https://open.spotify.com/playlist/")[1]))
+			if err != nil {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+				})
+				return
 			}
-		},
-		func(playlist lavalink.Playlist) {
-			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(langCode, playlist, identifier)},
-			})
-			if player.Track() == nil {
-				toPlay = &playlist.Tracks[0]
-				queue.Add(playlist.Tracks[1:]...)
-			} else {
-				queue.Add(playlist.Tracks...)
-			}
-		},
-		func(tracks []lavalink.Track) {
-			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, tracks[0])},
-			})
-			c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
-			if player.Track() == nil {
-				toPlay = &tracks[0]
-			} else {
-				queue.Add(tracks[0])
+
+			for _, item := range results.Tracks.Tracks {
+				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(item.Track.ExternalIDs["isrc"]))
 
 			}
-		},
-		func() {
 			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundspotifyPlaylistSpotify(langCode, results)},
 			})
-		},
-		func(err error) {
+		} else if strings.Contains(identifier, "album") {
+			id := spotify.ID(strings.Split(identifier, "https://open.spotify.com/album/")[1])
+			results, err := c.Spotify.GetAlbum(ctx, id)
+			if err != nil {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+				})
+				return
+			}
+
+			resultsa, _ := c.Spotify.GetAlbumTracks(ctx, id)
+
+			for _, Track := range resultsa.Tracks {
+				fmt.Println(Track.ID.String())
+				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(Track.ID.String()))
+
+			}
 			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundspotifyAlbumSpotify(langCode, results)},
 			})
-		},
-	))
+		} else if strings.Contains(identifier, "artist") {
+
+			results, err := c.Spotify.GetArtistsTopTracks(ctx, spotify.ID(strings.Split(identifier, "https://open.spotify.com/artist/")[1]), "TH")
+			if err != nil {
+				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+				})
+				return
+			}
+			for _, item := range results {
+				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(item.ExternalIDs["isrc"]))
+
+			}
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundspotifyArtistSpotify(langCode, results)},
+			})
+		}
+
+	} else {
+		identifierMap = append(identifierMap, identifier)
+
+	}
+	for _, k := range identifierMap {
+		fmt.Println(k)
+		c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx, k, disgolink.NewResultHandler(
+			func(track lavalink.Track) {
+				if !is_spotify {
+					s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+						Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, track)},
+					})
+
+				}
+				c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
+
+				if player.Track() == nil {
+					toPlay = &track
+				} else {
+
+					queue.Add(track)
+				}
+
+			},
+			func(playlist lavalink.Playlist) {
+				if !is_spotify {
+					s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+						Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundPlaylist(langCode, playlist, identifier)},
+					})
+				}
+
+				if player.Track() == nil {
+					toPlay = &playlist.Tracks[0]
+					queue.Add(playlist.Tracks[1:]...)
+				} else {
+					queue.Add(playlist.Tracks...)
+				}
+
+			},
+			func(tracks []lavalink.Track) {
+				if !is_spotify {
+					s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+						Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundTrack(langCode, tracks[0])},
+					})
+					c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
+				}
+
+				if player.Track() == nil {
+					toPlay = &tracks[0]
+				} else {
+					queue.Add(tracks[0])
+
+				}
+
+			},
+			func() {
+				if !is_spotify {
+					s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+						Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
+					})
+				}
+			},
+			func(err error) {
+				if !is_spotify {
+					s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+						Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+					})
+				}
+			},
+		))
+	}
 
 	if toPlay == nil {
 		return

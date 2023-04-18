@@ -8,6 +8,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/disgolink/v2/lavalink"
+	"github.com/zmb3/spotify/v2"
 )
 
 func embedPlayFoundTrack(l languages.Lang, track lavalink.Track) *discordgo.MessageEmbed {
@@ -16,17 +17,17 @@ func embedPlayFoundTrack(l languages.Lang, track lavalink.Track) *discordgo.Mess
 		Title: l.MusicCommands.PlayTrack,
 		Fields: []*discordgo.MessageEmbedField{
 			{
-				Name:   "song",
+				Name:   "Song",
 				Value:  fmt.Sprintf("[%s](%s)", track.Info.Title, *track.Info.URI),
 				Inline: false,
 			},
 			{
-				Name:   "author",
+				Name:   "Author",
 				Value:  track.Info.Author,
 				Inline: true,
 			},
 			{
-				Name:   "source",
+				Name:   "Source",
 				Value:  track.Info.SourceName,
 				Inline: true,
 			},
@@ -44,13 +45,13 @@ func embedPlayFoundPlaylist(l languages.Lang, playlist lavalink.Playlist, link s
 		Title: l.MusicCommands.PlayPlaylist,
 		Fields: []*discordgo.MessageEmbedField{
 			{
-				Name:   "playlist",
+				Name:   "Playlist",
 				Value:  fmt.Sprintf("[%s](%s)", playlist.Info.Name, link),
 				Inline: false,
 			},
 
 			{
-				Name:   "tracks",
+				Name:   "Tracks",
 				Value:  fmt.Sprintf("%d", len(playlist.Tracks)),
 				Inline: true,
 			},
@@ -280,5 +281,120 @@ func embedTimescale(Speed, Pitch, Rate float64) *discordgo.MessageEmbed {
 	return &discordgo.MessageEmbed{
 		Color: 0xff4700,
 		Title: fmt.Sprintf("Speed:`%.1f`,Pitch: `%.1f`,Rate: `%.1f`", Speed, Pitch, Rate),
+	}
+}
+func embedPlayFoundTrackSpotify(l languages.Lang, track *spotify.FullTrack) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.PlayTrack,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "Song",
+				Value:  fmt.Sprintf("[%s](%s)", track.Name, track.URI),
+				Inline: false,
+			},
+			{
+				Name:   "Artist",
+				Value:  track.Artists[0].Name,
+				Inline: true,
+			},
+			{
+				Name:   "Source",
+				Value:  "Spotify",
+				Inline: true,
+			},
+		},
+		Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: track.Album.Images[0].URL,
+		},
+	}
+}
+func embedPlayFoundspotifyPlaylistSpotify(l languages.Lang, Playlist *spotify.FullPlaylist) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.PlayTrack,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "Song",
+				Value:  fmt.Sprintf("[%s](%s)", Playlist.Name, Playlist.URI),
+				Inline: false,
+			},
+			{
+				Name:   "Owner",
+				Value:  fmt.Sprintf("[%s](%s)", Playlist.Owner.DisplayName, Playlist.Owner.URI),
+				Inline: true,
+			},
+			{
+				Name:   "Tracks",
+				Value:  fmt.Sprintf("%d", len(Playlist.Tracks.Tracks)),
+				Inline: true,
+			},
+			{
+				Name:   "Source",
+				Value:  "Spotify",
+				Inline: true,
+			},
+		}, Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: Playlist.Images[0].URL,
+		},
+	}
+}
+func embedPlayFoundspotifyAlbumSpotify(l languages.Lang, Album *spotify.FullAlbum) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.PlayTrack,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "Album",
+				Value:  fmt.Sprintf("[%s](%s)", Album.Name, Album.URI),
+				Inline: false,
+			},
+			{
+				Name:   "Artist",
+				Value:  fmt.Sprintf("[%s](%s)", Album.Artists[0].Name, Album.Artists[0].URI),
+				Inline: true,
+			},
+			{
+				Name:   "Tracks",
+				Value:  fmt.Sprintf("%d", len(Album.Tracks.Tracks)),
+				Inline: true,
+			},
+			{
+				Name:   "Source",
+				Value:  "Spotify",
+				Inline: true,
+			},
+		}, Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: Album.Images[0].URL,
+		},
+	}
+}
+func embedPlayFoundspotifyArtistSpotify(l languages.Lang, Tracks []spotify.FullTrack) *discordgo.MessageEmbed {
+
+	return &discordgo.MessageEmbed{
+		Color: 0xff4700,
+		Title: l.MusicCommands.PlayTrack,
+		Fields: []*discordgo.MessageEmbedField{
+			{
+				Name:   "Artist",
+				Value:  fmt.Sprintf("[%s](%s)", Tracks[0].Artists[0].Name, Tracks[0].Artists[0].URI),
+				Inline: false,
+			},
+			{
+				Name:   "Tracks",
+				Value:  fmt.Sprintf("%d", len(Tracks)),
+				Inline: true,
+			},
+			{
+				Name:   "Source",
+				Value:  "Spotify",
+				Inline: true,
+			},
+		}, Thumbnail: &discordgo.MessageEmbedThumbnail{
+			URL: Tracks[0].Album.Images[0].URL,
+		},
 	}
 }
