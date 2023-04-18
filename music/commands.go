@@ -357,9 +357,8 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			resultsa, _ := c.Spotify.GetAlbumTracks(ctx, id)
 
 			for _, Track := range resultsa.Tracks {
-				fmt.Println(Track.ID.String())
-				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(Track.ID.String()))
-
+				results, _ := c.Spotify.GetTrack(ctx, spotify.ID(strings.Split(Track.ExternalURLs["spotify"], "https://open.spotify.com/track/")[1]))
+				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(results.ExternalIDs["isrc"]))
 			}
 			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundspotifyAlbumSpotify(langCode, results)},
