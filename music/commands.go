@@ -376,7 +376,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(item.ExternalIDs["isrc"]))
 
 			}
-			fmt.Println(results)
+
 			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundspotifyArtistSpotify(langCode, results)},
 			})
