@@ -475,18 +475,18 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				}
 			},
 		))
-		if toPlay == nil {
-			return
-		}
 
-		if err := s.ChannelVoiceJoinManual(i.GuildID, voiceState.ChannelID, false, true); err != nil {
-			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
-			})
-			return
-		}
+	}
+	if toPlay == nil {
+		return
 	}
 
+	if err := s.ChannelVoiceJoinManual(i.GuildID, voiceState.ChannelID, false, true); err != nil {
+		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+			Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+		})
+		return
+	}
 	player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
 
 }
