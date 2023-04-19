@@ -381,7 +381,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				Embeds: &[]*discordgo.MessageEmbed{embedPlayFoundspotifyArtistSpotify(langCode, results)},
 			})
 		}
-		for _, k := range identifierMap {
+		for o, k := range identifierMap {
 			results, err := c.Bot.Lavalink.BestNode().LoadTracks(ctx, k)
 			if err != nil {
 				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
@@ -392,6 +392,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			if results.LoadType == lavalink.LoadTypeNoMatches || results.LoadType == lavalink.LoadTypeLoadFailed {
 				continue
 			}
+
 			if results.Tracks[0].Info.SourceName == "youtube" {
 				c.Bot.Queues.Cache[i.GuildID] = results.Tracks[0].Info.Identifier
 			}
@@ -399,6 +400,18 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				toPlay = &results.Tracks[0]
 			} else {
 				queue.Add(results.Tracks...)
+			}
+			if o == 0 {
+				if toPlay == nil {
+					return
+				}
+
+				if err := s.ChannelVoiceJoinManual(i.GuildID, voiceState.ChannelID, false, true); err != nil {
+					s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+						Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+					})
+					return
+				}
 			}
 		}
 	} else {
@@ -462,17 +475,16 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				}
 			},
 		))
-	}
+		if toPlay == nil {
+			return
+		}
 
-	if toPlay == nil {
-		return
-	}
-
-	if err := s.ChannelVoiceJoinManual(i.GuildID, voiceState.ChannelID, false, true); err != nil {
-		s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-			Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
-		})
-		return
+		if err := s.ChannelVoiceJoinManual(i.GuildID, voiceState.ChannelID, false, true); err != nil {
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
+			})
+			return
+		}
 	}
 
 	player.Update(context.TODO(), lavalink.WithTrack(*toPlay))

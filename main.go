@@ -51,6 +51,7 @@ func init() {
 func main() {
 
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
+		fmt.Print("\033[32m")
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 		log.Printf("Author: %v", con.Info.Author)
 		log.Printf("Version: %v", con.Info.Version)
