@@ -1,5 +1,16 @@
 # misha
 
+## subport
+
+youtube
+youtube-music
+spotify
+bandcamp
+soundcloud
+twitch
+vimeo
+http(radio)
+
 ## music commands
 
 play
@@ -42,7 +53,11 @@ volume
 
 ## note patch next update
 
-spotify
+optimize function play and update function queue
+
+function play is a trash
+
+save memory
 
 ## big update
 
