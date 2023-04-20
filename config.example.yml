@@ -1,0 +1,22 @@
+info:
+  author:
+  version: 
+discord:
+  token:
+  guild: 
+  rmcmd: true
+database:
+  url: mongodb://localhost:27017
+  database: misha
+  collection: 
+    - guilds
+lavalink:
+  name: misha
+  address: 0.0.0.0:2333
+  password: youshallnotpass
+  https: false
+web: 
+  url: http://127.0.0.1:80
+spotify:
+  client: 
+  secret: 
