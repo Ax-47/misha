@@ -3,7 +3,6 @@ package lava
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"time"
 
 	"github.com/disgoorg/log"
@@ -22,24 +21,20 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		nextTrack lavalink.Track
 		ok        bool
 	)
-	if auto {
+	if auto && len(queue.Tracks) == 0 {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		cache := b.Queues.Cache[event.GuildID().String()]
-		url := fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache)
-		b.Lavalink.BestNode().LoadTracksHandler(ctx,
-			url,
-			disgolink.NewResultHandler(func(track lavalink.Track) {
-			}, func(playlist lavalink.Playlist) {
-				queue.Add(playlist.Tracks[rand.Intn(24)])
-			}, func(tracks []lavalink.Track) {
-				cache = "gykWYPrArbY"
-			}, func() {
-				cache = "gykWYPrArbY"
-			},
-				func(err error) {
-					cache = "gykWYPrArbY"
-				}))
+		c := b.Lavalink.BestNode()
+		if res, _ := c.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache)); res.LoadType == lavalink.LoadTypePlaylistLoaded {
+			queue.Add(res.Tracks[1])
+
+		} else {
+			cache = "gykWYPrArbY"
+			res, _ := c.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache))
+			queue.Add(res.Tracks[1])
+
+		}
 	}
 	switch queue.Type {
 	case QueueTypeNormal:

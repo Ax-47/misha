@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"misha/extensions"
 	"misha/lava"
+
 	"regexp"
 	"strings"
 	"time"
@@ -570,40 +571,23 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		})
 		return
 	}
-	if c.Bot.Queues.GetAuto(i.GuildID) {
-		r := rand.Intn(24)
+	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseDeferredChannelMessageWithSource}); err != nil {
+		return
+	}
+	if c.Bot.Queues.GetAuto(i.GuildID) && len(queue.Tracks) == 0 {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-
+		r := rand.Intn(3) + 1
 		cache := c.Bot.Queues.Cache[i.GuildID]
-		cha := false
-
-		for {
-			if cha {
-				break
-			}
-
-			c.Bot.Lavalink.BestNode().LoadTracksHandler(ctx,
-				fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache),
-				disgolink.NewResultHandler(func(track lavalink.Track) {
-					cache = "gykWYPrArbY"
-
-				}, func(playlist lavalink.Playlist) {
-					queue.Add(playlist.Tracks[r])
-					cache = playlist.Tracks[r].Info.Identifier
-					cha = true
-
-				}, func(tracks []lavalink.Track) {
-				}, func() {
-					cache = "gykWYPrArbY"
-
-				}, func(err error) {
-					cache = "gykWYPrArbY"
-
-				}))
-
+		node := c.Bot.Lavalink.BestNode()
+		if res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache)); res.LoadType == lavalink.LoadTypePlaylistLoaded {
+			queue.Add(res.Tracks[r])
+		} else {
+			cache = "gykWYPrArbY"
+			res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache))
+			queue.Add(res.Tracks[r])
 		}
-		c.Bot.Queues.Cache[i.GuildID] = cache
+
 	}
 	track, ok := queue.Next()
 
@@ -612,23 +596,15 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	} else {
 
 		if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Embeds: []*discordgo.MessageEmbed{embedError(err)},
-				},
+			s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+				Embeds: &[]*discordgo.MessageEmbed{embedError(err)},
 			})
 			return
 		}
 	}
-
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{embedSkip(langCode)},
-		},
+	s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
+		Embeds: &[]*discordgo.MessageEmbed{embedSkip(langCode)},
 	})
-
 }
 func Seek(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate) {
 	langCode := c.Lang(i.Locale.String())
