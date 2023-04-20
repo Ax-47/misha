@@ -487,6 +487,8 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				})
 				if track.Info.SourceName == "youtube" {
 					c.Bot.Queues.Cache[i.GuildID] = track.Info.Identifier
+				} else {
+					c.Bot.Queues.Cache[i.GuildID] = "gykWYPrArbY"
 				}
 				if player.Track() == nil {
 					toPlay = &track
@@ -516,6 +518,8 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				}
 				if tracks[0].Info.SourceName == "youtube" {
 					c.Bot.Queues.Cache[i.GuildID] = tracks[0].Info.Identifier
+				} else {
+					c.Bot.Queues.Cache[i.GuildID] = "gykWYPrArbY"
 				}
 				if player.Track() == nil {
 					toPlay = &tracks[0]

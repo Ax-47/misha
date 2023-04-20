@@ -33,9 +33,12 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 			}, func(playlist lavalink.Playlist) {
 				queue.Add(playlist.Tracks[rand.Intn(25)])
 			}, func(tracks []lavalink.Track) {
-			}, func() {},
+				cache = "gykWYPrArbY"
+			}, func() {
+				cache = "gykWYPrArbY"
+			},
 				func(err error) {
-					fmt.Println(err)
+					cache = "gykWYPrArbY"
 				}))
 	}
 	switch queue.Type {
