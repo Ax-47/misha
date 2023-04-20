@@ -571,7 +571,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		return
 	}
 	if c.Bot.Queues.GetAuto(i.GuildID) {
-		r := rand.Intn(25)
+		r := rand.Intn(24)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 

@@ -31,7 +31,7 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 			url,
 			disgolink.NewResultHandler(func(track lavalink.Track) {
 			}, func(playlist lavalink.Playlist) {
-				queue.Add(playlist.Tracks[rand.Intn(25)])
+				queue.Add(playlist.Tracks[rand.Intn(24)])
 			}, func(tracks []lavalink.Track) {
 				cache = "gykWYPrArbY"
 			}, func() {
