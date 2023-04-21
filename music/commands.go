@@ -3,7 +3,6 @@ package music
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"misha/extensions"
 	"misha/lava"
 
@@ -327,13 +326,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		if strings.Contains(identifier, "track") {
 			typeOfUri = "track"
 			trackRes, err = c.Spotify.GetTrack(ctx, spotify.ID(strings.Split(identifier, "https://open.spotify.com/track/")[1]))
-			if err != nil {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
-				})
-				return
-			}
-			if trackRes == nil {
+			if err != nil || trackRes == nil {
 				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
 				})
@@ -344,13 +337,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 		} else if strings.Contains(identifier, "playlist") {
 			typeOfUri = "playlist"
 			playlistRes, err = c.Spotify.GetPlaylist(ctx, spotify.ID(strings.Split(identifier, "https://open.spotify.com/playlist/")[1]))
-			if err != nil {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
-				})
-				return
-			}
-			if playlistRes == nil {
+			if err != nil || playlistRes == nil {
 				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
 				})
@@ -365,13 +352,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			typeOfUri = "album"
 			id := spotify.ID(strings.Split(identifier, "https://open.spotify.com/album/")[1])
 			albumRes, err = c.Spotify.GetAlbum(ctx, id)
-			if err != nil {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
-				})
-				return
-			}
-			if albumRes == nil {
+			if err != nil || albumRes == nil {
 				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
 				})
@@ -385,6 +366,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				return
 			}
 			for _, Track := range resultsa.Tracks {
+
 				results, _ := c.Spotify.GetTrack(ctx, spotify.ID(strings.Split(Track.ExternalURLs["spotify"], "https://open.spotify.com/track/")[1]))
 				identifierMap = append(identifierMap, lavalink.SearchTypeYoutube.Apply(results.ExternalIDs["isrc"]))
 			}
@@ -393,13 +375,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 			typeOfUri = "artist"
 			id := spotify.ID(strings.Split(identifier, "https://open.spotify.com/artist/")[1])[0:22]
 			artistRes, err = c.Spotify.GetArtistsTopTracks(ctx, id, "TH")
-			if err != nil {
-				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
-					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
-				})
-				return
-			}
-			if artistRes == nil {
+			if err != nil || artistRes == nil {
 				s.InteractionResponseEdit(i.Interaction, &discordgo.WebhookEdit{
 					Embeds: &[]*discordgo.MessageEmbed{embedNotFoundTrack(langCode)},
 				})
@@ -527,7 +503,7 @@ func Play(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 				} else {
 					queue.Add(tracks[0])
 				}
-				fmt.Println(tracks[0].Info.Identifier)
+
 			},
 			func() {
 				if !is_spotify {
@@ -574,21 +550,7 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseDeferredChannelMessageWithSource}); err != nil {
 		return
 	}
-	if c.Bot.Queues.GetAuto(i.GuildID) && len(queue.Tracks) == 0 {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-		r := rand.Intn(3) + 1
-		cache := c.Bot.Queues.Cache[i.GuildID]
-		node := c.Bot.Lavalink.BestNode()
-		if res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache)); res.LoadType == lavalink.LoadTypePlaylistLoaded {
-			queue.Add(res.Tracks[r])
-		} else {
-			cache = "gykWYPrArbY"
-			res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache))
-			queue.Add(res.Tracks[r])
-		}
 
-	}
 	track, ok := queue.Next()
 
 	if !ok {
