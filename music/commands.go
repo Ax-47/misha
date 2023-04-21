@@ -3,6 +3,7 @@ package music
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"misha/extensions"
 	"misha/lava"
 
@@ -550,7 +551,21 @@ func Skip(c *extensions.Ex, s *discordgo.Session, i *discordgo.InteractionCreate
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{Type: discordgo.InteractionResponseDeferredChannelMessageWithSource}); err != nil {
 		return
 	}
+	if c.Bot.Queues.GetAuto(i.GuildID) && len(queue.Tracks) == 0 {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		r := rand.Intn(3) + 1
+		cache := c.Bot.Queues.Cache[i.GuildID]
+		node := c.Bot.Lavalink.BestNode()
+		if res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache)); res.LoadType == lavalink.LoadTypePlaylistLoaded {
+			queue.Add(res.Tracks[r])
+		} else {
+			cache = "gykWYPrArbY"
+			res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", cache, cache))
+			queue.Add(res.Tracks[r])
+		}
 
+	}
 	track, ok := queue.Next()
 
 	if !ok {
