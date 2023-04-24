@@ -14,10 +14,11 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/disgoorg/disgolink/v2/disgolink"
 	"github.com/disgoorg/snowflake/v2"
+	"github.com/servusdei2018/shards"
 )
 
 var (
-	s   *discordgo.Session
+	s   *shards.Manager
 	con *config.Config
 	Ex  *extensions.Ex
 )
@@ -35,7 +36,7 @@ func init() {
 
 func init() {
 	var err error
-	s, err = discordgo.New("Bot " + con.Discord.Token)
+	s, err = shards.New("Bot " + con.Discord.Token)
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
 	}
@@ -57,7 +58,7 @@ func main() {
 		log.Printf("Version: %v", con.Info.Version)
 
 		s.State.TrackVoice = true
-		s.Identify.Intents = discordgo.IntentsAll
+
 		Ex.Bot.Queues = &lava.QueueManager{
 			Queues:   make(map[string]*lava.Queue),
 			Autoplay: make(map[string]bool),
@@ -90,37 +91,25 @@ func main() {
 
 	s.AddHandler(Ex.Bot.OnVoiceStateUpdate)
 	s.AddHandler(Ex.Bot.OnVoiceServerUpdate)
-	err := s.Open()
-	if err != nil {
-		log.Fatalf("Cannot open the session: %v", err)
-	}
 
 	log.Println("Adding commands...")
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(Commands))
 	for i, v := range Commands {
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, con.Discord.Guild, v)
+		err := s.ApplicationCommandCreate(con.Discord.Guild, v)
 		if err != nil {
 			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
 		}
-		registeredCommands[i] = cmd
+		registeredCommands[i] = v
 	}
-
-	defer s.Close()
+	s.RegisterIntent(discordgo.IntentsAll)
+	err := s.Start()
+	if err != nil {
+		log.Println(err)
+	}
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt)
 	log.Println("Press Ctrl+C to exit")
 	<-stop
-
-	if con.Discord.Rmcmd {
-		log.Println("Removing commands...")
-		for _, v := range registeredCommands {
-			err := s.ApplicationCommandDelete(s.State.User.ID, con.Discord.Guild, v.ID)
-			if err != nil {
-				log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
-			}
-		}
-	}
-
 	log.Println("Gracefully shutting down.")
 }
