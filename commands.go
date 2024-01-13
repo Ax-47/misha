@@ -158,6 +158,6 @@ var commands = []discord.ApplicationCommandCreate{
 
 func registerCommands(client bot.Client) {
 	if _, err := client.Rest().SetGuildCommands(client.ApplicationID(), snowflake.GetEnv("GUILD_ID"), commands); err != nil {
-		slog.Error("error while registering commands", slog.Any("err", err))
+		slog.Error("error while registering commands ", slog.Any("err", err))
 	}
 }
