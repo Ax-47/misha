@@ -177,6 +177,7 @@ func (b *Bot) Skip(event *events.ApplicationCommandInteractionCreate, data disco
 	}
 
 	track, ok := queue.Skip(amount)
+
 	if !ok && !queue.Autoplay {
 		if err := player.Update(context.TODO(), lavalink.WithNullTrack()); err != nil {
 			return event.CreateMessage(discord.MessageCreate{
@@ -421,8 +422,8 @@ func (b *Bot) Play(event *events.ApplicationCommandInteractionCreate, data disco
 			},
 		})
 	}
-	queue := b.Queues.Get(*data.GuildID())
-	player := b.Lavalink.Player(*data.GuildID())
+	queue := b.Queues.Get(*guildID)
+	player := b.Lavalink.Player(*guildID)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -495,7 +496,9 @@ func (b *Bot) Play(event *events.ApplicationCommandInteractionCreate, data disco
 			},
 		})
 	}
-
+	if toPlay == nil {
+		return nil
+	}
 	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
 }
 func (b *Bot) Autoplay(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {

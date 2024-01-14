@@ -40,9 +40,9 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		queue.Add(event.Track)
 		nextTrack, ok = queue.Next()
 	}
-	if queue.Autoplay && !ok {
+	if queue.Autoplay && !ok && player.Track() == nil {
 		nextTrack = b.findtrack(player.Node(), event.Track.Info.Identifier)
-	} else if !queue.Autoplay && !ok {
+	} else if !queue.Autoplay && !ok && player.Track() == nil {
 		b.Cache.SetCache(guilid.String(), strconv.Itoa(player.Volume()))
 		b.Client.UpdateVoiceState(context.TODO(), guilid, nil, false, false)
 		return

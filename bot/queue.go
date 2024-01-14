@@ -1,6 +1,7 @@
 package bot
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -62,13 +63,15 @@ func (q *Queue) Next() (lavalink.Track, bool) {
 
 func (q *Queue) Skip(amount int) (lavalink.Track, bool) {
 	if len(q.Tracks) == 0 {
+		fmt.Println("test", len(q.Tracks), len(q.Tracks) == 0)
 		return lavalink.Track{}, false
 	}
 	if amount > len(q.Tracks) {
 		amount = len(q.Tracks)
 	}
+	track := q.Tracks[0]
 	q.Tracks = q.Tracks[amount:]
-	return q.Tracks[0], true
+	return track, true
 }
 
 func (q *Queue) Clear() {
