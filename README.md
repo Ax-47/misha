@@ -18,7 +18,8 @@
 * config .env
 * $ docker-compose up -d
 * $ .\a
-* $ go run .
+* $ go build
+* $ .\misha
 
 ## Commands
 
