@@ -36,8 +36,9 @@ func (q QueueType) String() string {
 }
 
 type Queue struct {
-	Tracks []lavalink.Track
-	Type   QueueType
+	Tracks   []lavalink.Track
+	Type     QueueType
+	Autoplay bool
 }
 
 func (q *Queue) Shuffle() {

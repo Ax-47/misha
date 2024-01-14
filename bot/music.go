@@ -173,12 +173,23 @@ func (b *Bot) Skip(event *events.ApplicationCommandInteractionCreate, data disco
 	}
 
 	track, ok := queue.Skip(amount)
-	if !ok {
+	if !ok && !queue.Autoplay {
+		if err := player.Update(context.TODO(), lavalink.WithNullTrack()); err != nil {
+			return event.CreateMessage(discord.MessageCreate{
+				Embeds: []discord.Embed{
+					embed.ErrorOther(),
+				},
+			})
+		}
+
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
 				embed.ErrorQueueIsNil(),
 			},
 		})
+	} else if !ok && queue.Autoplay {
+
+		track = b.findtrack(player.Track().Info.Identifier)
 	}
 
 	if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {
@@ -326,7 +337,13 @@ func (b *Bot) Disconnect(event *events.ApplicationCommandInteractionCreate, data
 			},
 		})
 	}
-
+	if err := player.Update(context.TODO(), lavalink.WithNullTrack()); err != nil {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{
+				embed.ErrorOther(),
+			},
+		})
+	}
 	if err := b.Client.UpdateVoiceState(context.TODO(), *event.GuildID(), nil, false, false); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
@@ -472,4 +489,21 @@ func (b *Bot) Play(event *events.ApplicationCommandInteractionCreate, data disco
 	}
 
 	return player.Update(context.TODO(), lavalink.WithTrack(*toPlay))
+}
+func (b *Bot) Autoplay(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
+	queue := b.Queues.Get(*event.GuildID())
+	if queue == nil {
+		return event.CreateMessage(discord.MessageCreate{
+			Embeds: []discord.Embed{
+				embed.ErrorNotFoundPlayer(),
+			},
+		})
+	}
+
+	queue.Autoplay = !queue.Autoplay
+	return event.CreateMessage(discord.MessageCreate{
+		Embeds: []discord.Embed{
+			embed.Autoplay(queue.Autoplay),
+		},
+	})
 }

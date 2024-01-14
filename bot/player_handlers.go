@@ -2,29 +2,26 @@ package bot
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
 func (b *Bot) OnPlayerPause(player disgolink.Player, event lavalink.PlayerPauseEvent) {
-	slog.Info("player paused", slog.Any("event", event))
+
 }
 
 func (b *Bot) OnPlayerResume(player disgolink.Player, event lavalink.PlayerResumeEvent) {
-	slog.Info("player resumed", slog.Any("event", event))
+
 }
 
 func (b *Bot) OnTrackStart(player disgolink.Player, event lavalink.TrackStartEvent) {
-	slog.Info("track started", slog.Any("event", event))
 }
 
 func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) {
-	if !event.Reason.MayStartNext() {
-		return
-	}
-
 	queue := b.Queues.Get(event.GuildID())
 	var (
 		nextTrack lavalink.Track
@@ -41,8 +38,10 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		queue.Add(event.Track)
 		nextTrack, ok = queue.Next()
 	}
-
-	if !ok {
+	if queue.Autoplay && !ok {
+		nextTrack = b.findtrack(event.Track.Info.Identifier)
+	} else if !queue.Autoplay && !ok {
+		b.Client.UpdateVoiceState(context.TODO(), event.GuildID(), nil, false, false)
 		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {
@@ -51,17 +50,35 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 }
 
 func (b *Bot) OnTrackException(player disgolink.Player, event lavalink.TrackExceptionEvent) {
-	slog.Info("track exception", slog.Any("event", event))
+
 }
 
 func (b *Bot) OnTrackStuck(player disgolink.Player, event lavalink.TrackStuckEvent) {
-	slog.Info("track stuck", slog.Any("event", event))
+
 }
 
 func (b *Bot) OnWebSocketClosed(player disgolink.Player, event lavalink.WebSocketClosedEvent) {
-	slog.Info("websocket closed", slog.Any("event", event))
+
 }
 
 func (b *Bot) OnUnknownEvent(p disgolink.Player, e lavalink.UnknownEvent) {
 	slog.Info("unknown event", slog.Any("event", e.Type()), slog.String("data", string(e.Data)))
+}
+
+func (b *Bot) findtrack(identifier string) lavalink.Track {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	bestnode := b.Lavalink.BestNode()
+	if res, _ := bestnode.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier)); res.LoadType == lavalink.LoadTypePlaylist {
+		tracks := res.Data.(lavalink.Playlist).Tracks
+		fmt.Println(tracks)
+		return tracks[1]
+
+	}
+	identifier = "gykWYPrArbY"
+	res, _ := bestnode.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier))
+
+	tracks := res.Data.(lavalink.Playlist).Tracks
+	return tracks[1]
+
 }

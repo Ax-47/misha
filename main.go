@@ -85,6 +85,7 @@ func main() {
 		"skip":        b.Skip,
 		"bass-boost":  b.BassBoost,
 		"disconnect":  b.Disconnect,
+		"autoplay":    b.Autoplay,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

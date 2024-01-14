@@ -155,7 +155,16 @@ func Shuffle() discord.Embed {
 		Color: 0xff4700,
 	}
 }
-
+func Autoplay(state bool) discord.Embed {
+	status := "เปิด"
+	if !state {
+		status = "ปิด"
+	}
+	return discord.Embed{
+		Title: fmt.Sprintf("`%s` autoplayละ", status),
+		Color: 0xff4700,
+	}
+}
 func QueueButtons() discord.ActionRowComponent {
 
 	return discord.NewActionRow(discord.NewSuccessButton("◀", "previous"), discord.NewSuccessButton("▶", "next"))
