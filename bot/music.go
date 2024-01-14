@@ -83,12 +83,16 @@ func (b *Bot) Volume(event *events.ApplicationCommandInteractionCreate, data dis
 	}
 	if err := player.Update(context.TODO(), lavalink.WithVolume(volume)); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
-			Content: fmt.Sprintf("Error while setting volume: `%s`", err),
+			Embeds: []discord.Embed{
+				embed.ErrorOther(),
+			},
 		})
 	}
 
 	return event.CreateMessage(discord.MessageCreate{
-		Content: fmt.Sprintf("Volume set to `%d`", volume),
+		Embeds: []discord.Embed{
+			embed.Volume(strconv.Itoa(volume)),
+		},
 	})
 }
 
@@ -400,7 +404,8 @@ func (b *Bot) Play(event *events.ApplicationCommandInteractionCreate, data disco
 		identifier = lavalink.SearchTypeYouTube.Apply(identifier)
 	}
 
-	voiceState, ok := b.Client.Caches().VoiceState(*event.GuildID(), event.User().ID)
+	var guildID = event.GuildID()
+	voiceState, ok := b.Client.Caches().VoiceState(*guildID, event.User().ID)
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
@@ -476,11 +481,14 @@ func (b *Bot) Play(event *events.ApplicationCommandInteractionCreate, data disco
 			})
 		},
 	))
-	if toPlay == nil {
-		return nil
+	if err := b.settingCache(player, guildID.String(), event); err != nil {
+		_, _ = b.Client.Rest().UpdateInteractionResponse(event.ApplicationID(), event.Token(), discord.MessageUpdate{
+			Embeds: &[]discord.Embed{
+				embed.ErrorOther(),
+			},
+		})
 	}
-
-	if err := b.Client.UpdateVoiceState(context.TODO(), *event.GuildID(), voiceState.ChannelID, false, true); err != nil {
+	if err := b.Client.UpdateVoiceState(context.TODO(), *guildID, voiceState.ChannelID, false, true); err != nil {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
 				embed.ErrorCanNotConnectVC(),

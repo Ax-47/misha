@@ -165,6 +165,12 @@ func Autoplay(state bool) discord.Embed {
 		Color: 0xff4700,
 	}
 }
+func Volume(volume string) discord.Embed {
+	return discord.Embed{
+		Title: fmt.Sprintf("ปรับเสียงเป็น`%s` ", volume),
+		Color: 0xff4700,
+	}
+}
 func QueueButtons() discord.ActionRowComponent {
 
 	return discord.NewActionRow(discord.NewSuccessButton("◀", "previous"), discord.NewSuccessButton("▶", "next"))
