@@ -189,7 +189,7 @@ func (b *Bot) Skip(event *events.ApplicationCommandInteractionCreate, data disco
 		})
 	} else if !ok && queue.Autoplay {
 
-		track = b.findtrack(player.Track().Info.Identifier)
+		track = b.findtrack(player.Node(), player.Track().Info.Identifier)
 	}
 
 	if err := player.Update(context.TODO(), lavalink.WithTrack(track)); err != nil {

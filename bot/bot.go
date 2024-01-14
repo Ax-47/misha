@@ -9,13 +9,16 @@ import (
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/snowflake/v2"
+
+	"0x47/misha/cache"
 )
 
-func NewBot() *Bot {
+func NewBot(addr, password string) *Bot {
 	return &Bot{
 		Queues: &QueueManager{
 			queues: make(map[snowflake.ID]*Queue),
 		},
+		Cache: cache.NewCache(addr, password),
 	}
 }
 
@@ -24,6 +27,7 @@ type Bot struct {
 	Lavalink disgolink.Client
 	Handlers map[string]func(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error
 	Queues   *QueueManager
+	Cache    cache.Cache
 }
 
 func (b *Bot) OnApplicationCommand(event *events.ApplicationCommandInteractionCreate) {

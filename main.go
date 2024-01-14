@@ -34,14 +34,16 @@ func main() {
 	slog.Info("disgo version", slog.String("version", disgo.Version))
 	slog.Info("disgolink version: ", slog.String("version", disgolink.Version))
 
-	b := sbot.NewBot()
 	var (
 		Token         = os.Getenv("TOKEN")
 		NodeName      = os.Getenv("NODE_NAME")
 		NodeAddress   = os.Getenv("NODE_ADDRESS")
 		NodePassword  = os.Getenv("NODE_PASSWORD")
 		NodeSecure, _ = strconv.ParseBool(os.Getenv("NODE_SECURE"))
+		RedisAddress  = os.Getenv("REDIS_ADDRESS")
+		RedisPassword = os.Getenv("REDIS_PASSWORD")
 	)
+	b := sbot.NewBot(RedisAddress, RedisPassword)
 	client, err := disgo.New(Token,
 		bot.WithGatewayConfigOpts(
 			gateway.WithIntents(gateway.IntentGuilds, gateway.IntentGuildVoiceStates),

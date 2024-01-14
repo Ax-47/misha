@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strconv"
 	"time"
 
 	"github.com/disgoorg/disgolink/v3/disgolink"
@@ -22,7 +23,8 @@ func (b *Bot) OnTrackStart(player disgolink.Player, event lavalink.TrackStartEve
 }
 
 func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) {
-	queue := b.Queues.Get(event.GuildID())
+	guilid := event.GuildID()
+	queue := b.Queues.Get(guilid)
 	var (
 		nextTrack lavalink.Track
 		ok        bool
@@ -39,9 +41,10 @@ func (b *Bot) OnTrackEnd(player disgolink.Player, event lavalink.TrackEndEvent) 
 		nextTrack, ok = queue.Next()
 	}
 	if queue.Autoplay && !ok {
-		nextTrack = b.findtrack(event.Track.Info.Identifier)
+		nextTrack = b.findtrack(player.Node(), event.Track.Info.Identifier)
 	} else if !queue.Autoplay && !ok {
-		b.Client.UpdateVoiceState(context.TODO(), event.GuildID(), nil, false, false)
+		b.Cache.SetCache(guilid.String(), strconv.Itoa(player.Volume()))
+		b.Client.UpdateVoiceState(context.TODO(), guilid, nil, false, false)
 		return
 	}
 	if err := player.Update(context.TODO(), lavalink.WithTrack(nextTrack)); err != nil {
@@ -65,18 +68,18 @@ func (b *Bot) OnUnknownEvent(p disgolink.Player, e lavalink.UnknownEvent) {
 	slog.Info("unknown event", slog.Any("event", e.Type()), slog.String("data", string(e.Data)))
 }
 
-func (b *Bot) findtrack(identifier string) lavalink.Track {
+func (b *Bot) findtrack(node disgolink.Node, identifier string) lavalink.Track {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	bestnode := b.Lavalink.BestNode()
-	if res, _ := bestnode.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier)); res.LoadType == lavalink.LoadTypePlaylist {
+
+	if res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier)); res.LoadType == lavalink.LoadTypePlaylist {
 		tracks := res.Data.(lavalink.Playlist).Tracks
 		fmt.Println(tracks)
 		return tracks[1]
 
 	}
 	identifier = "gykWYPrArbY"
-	res, _ := bestnode.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier))
+	res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier))
 
 	tracks := res.Data.(lavalink.Playlist).Tracks
 	return tracks[1]
