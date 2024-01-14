@@ -196,7 +196,7 @@ func (b *Bot) Skip(event *events.ApplicationCommandInteractionCreate, data disco
 	})
 }
 
-func (b *Bot) QueueType(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
+func (b *Bot) Loop(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	queue := b.Queues.Get(*event.GuildID())
 	if queue == nil {
 		return event.CreateMessage(discord.MessageCreate{
@@ -208,7 +208,9 @@ func (b *Bot) QueueType(event *events.ApplicationCommandInteractionCreate, data 
 
 	queue.Type = QueueType(data.String("type"))
 	return event.CreateMessage(discord.MessageCreate{
-		Content: fmt.Sprintf("Queue type set to `%s`", queue.Type),
+		Embeds: []discord.Embed{
+			embed.Loop(queue.Type.String()),
+		},
 	})
 }
 

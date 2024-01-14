@@ -115,6 +115,12 @@ func Queue(id, queuetype string, tracks []lavalink.Track, index int) discord.Emb
 		Color: 0xff4700,
 	}
 }
+func Loop(queuetype string) discord.Embed {
+	return discord.Embed{
+		Title: fmt.Sprintf("loop :%s", queuetype),
+		Color: 0xff4700,
+	}
+}
 func Clear() discord.Embed {
 	return discord.Embed{
 		Title: "Clear ละ",

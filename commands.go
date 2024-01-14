@@ -154,6 +154,35 @@ var commands = []discord.ApplicationCommandCreate{
 		Name:        "queue",
 		Description: "Shows the current queue",
 	},
+	discord.SlashCommandCreate{
+		Name:        "clear-queue",
+		Description: "clear queue",
+	},
+	discord.SlashCommandCreate{
+		Name:        "loop",
+		Description: "loop",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionString{
+				Name:        "type",
+				Description: "loop type",
+				Required:    true,
+				Choices: []discord.ApplicationCommandOptionChoiceString{
+					{
+						Name:  "Normal",
+						Value: "normal",
+					},
+					{
+						Name:  "Repeat Track",
+						Value: "repeat_track",
+					},
+					{
+						Name:  "Repeat Queue",
+						Value: "repeat_queue",
+					},
+				},
+			},
+		},
+	},
 }
 
 func registerCommands(client bot.Client) {

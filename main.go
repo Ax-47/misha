@@ -78,7 +78,7 @@ func main() {
 		"players":     b.Players,
 		"queue":       b.Queue,
 		"clear-queue": b.ClearQueue,
-		"queue-type":  b.QueueType,
+		"loop":        b.Loop,
 		"shuffle":     b.Shuffle,
 		"seek":        b.Seek,
 		"volume":      b.Volume,
