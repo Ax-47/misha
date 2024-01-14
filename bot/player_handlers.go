@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -74,14 +75,13 @@ func (b *Bot) findtrack(node disgolink.Node, identifier string) lavalink.Track {
 
 	if res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier)); res.LoadType == lavalink.LoadTypePlaylist {
 		tracks := res.Data.(lavalink.Playlist).Tracks
-		fmt.Println(tracks)
-		return tracks[1]
+
+		return tracks[rand.Intn(25)]
 
 	}
 	identifier = "gykWYPrArbY"
 	res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier))
-
 	tracks := res.Data.(lavalink.Playlist).Tracks
-	return tracks[1]
+	return tracks[rand.Intn(25)]
 
 }
