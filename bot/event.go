@@ -16,6 +16,12 @@ func (b *Bot) ButtonsEvent(event *events.ComponentInteractionCreate) {
 		previous(b, event)
 	case "next":
 		next(b, event)
+	case "index":
+		index(b, event)
+	case "setting":
+		setting(b, event)
+	case "music":
+		music(b, event)
 	}
 
 }
@@ -76,5 +82,32 @@ func next(b *Bot, event *events.ComponentInteractionCreate) error {
 			embed.Queue(item[1], queue.Type.String(), queue.Tracks, page),
 		},
 		Components: &[]discord.ContainerComponent{embed.QueueButtons()},
+	})
+}
+func index(b *Bot, event *events.ComponentInteractionCreate) error {
+
+	return event.CreateMessage(discord.MessageCreate{
+		Embeds: []discord.Embed{
+			embed.HelpIndex(),
+		},
+		Components: []discord.ContainerComponent{embed.HelpComponent()},
+	})
+}
+func setting(b *Bot, event *events.ComponentInteractionCreate) error {
+
+	return event.CreateMessage(discord.MessageCreate{
+		Embeds: []discord.Embed{
+			embed.HelpSetting(),
+		},
+		Components: []discord.ContainerComponent{embed.HelpComponent()},
+	})
+}
+func music(b *Bot, event *events.ComponentInteractionCreate) error {
+
+	return event.CreateMessage(discord.MessageCreate{
+		Embeds: []discord.Embed{
+			embed.HelpMusic(),
+		},
+		Components: []discord.ContainerComponent{embed.HelpComponent()},
 	})
 }

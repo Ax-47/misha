@@ -75,8 +75,7 @@ func (b *Bot) findtrack(node disgolink.Node, identifier string) lavalink.Track {
 
 	if res, _ := node.LoadTracks(ctx, fmt.Sprintf("https://www.youtube.com/watch?v=%v&list=RD%v", identifier, identifier)); res.LoadType == lavalink.LoadTypePlaylist {
 		tracks := res.Data.(lavalink.Playlist).Tracks
-
-		return tracks[rand.Intn(25)]
+		return tracks[rand.Intn(3)+1]
 
 	}
 	identifier = "gykWYPrArbY"
