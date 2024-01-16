@@ -86,28 +86,28 @@ func next(b *Bot, event *events.ComponentInteractionCreate) error {
 }
 func index(b *Bot, event *events.ComponentInteractionCreate) error {
 
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{
+	return event.UpdateMessage(discord.MessageUpdate{
+		Embeds: &[]discord.Embed{
 			embed.HelpIndex(),
 		},
-		Components: []discord.ContainerComponent{embed.HelpComponent()},
+		Components: &[]discord.ContainerComponent{embed.HelpComponent()},
 	})
 }
 func setting(b *Bot, event *events.ComponentInteractionCreate) error {
 
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{
+	return event.UpdateMessage(discord.MessageUpdate{
+		Embeds: &[]discord.Embed{
 			embed.HelpSetting(),
 		},
-		Components: []discord.ContainerComponent{embed.HelpComponent()},
+		Components: &[]discord.ContainerComponent{embed.HelpComponent()},
 	})
 }
 func music(b *Bot, event *events.ComponentInteractionCreate) error {
 
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{
+	return event.UpdateMessage(discord.MessageUpdate{
+		Embeds: &[]discord.Embed{
 			embed.HelpMusic(),
 		},
-		Components: []discord.ContainerComponent{embed.HelpComponent()},
+		Components: &[]discord.ContainerComponent{embed.HelpComponent()},
 	})
 }

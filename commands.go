@@ -187,6 +187,10 @@ var commands = []discord.ApplicationCommandCreate{
 		Name:        "autoplay",
 		Description: "add the next song",
 	},
+	discord.SlashCommandCreate{
+		Name:        "help",
+		Description: "help",
+	},
 }
 
 func registerCommands(client bot.Client) {

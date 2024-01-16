@@ -88,6 +88,7 @@ func main() {
 		"bass-boost":  b.BassBoost,
 		"disconnect":  b.Disconnect,
 		"autoplay":    b.Autoplay,
+		"help":        b.Help,
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
