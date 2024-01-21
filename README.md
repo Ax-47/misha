@@ -25,7 +25,7 @@
 
 ### Music
 
-| Commands    | Desription | How to used |
+| Commands    | Desription | How to use  |
 | ----------- | ---------- | ----------- |
 | play        |            |             |
 | pause       |            |             |
