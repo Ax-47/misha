@@ -188,6 +188,143 @@ var commands = []discord.ApplicationCommandCreate{
 		Description: "add the next song",
 	},
 	discord.SlashCommandCreate{
+		Name:        "timescale",
+		Description: "Plays a song",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionInt{
+				Name:        "speed",
+				Description: "speed",
+				Required:    true,
+			},
+			discord.ApplicationCommandOptionInt{
+				Name:        "pitch",
+				Description: "pitch",
+				Required:    true,
+			},
+			discord.ApplicationCommandOptionInt{
+				Name:        "rate",
+				Description: "rate",
+				Required:    true,
+			},
+		},
+	},
+	discord.SlashCommandCreate{
+		Name:        "tremolo",
+		Description: "Plays a song",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionInt{
+				Name:        "frequency",
+				Description: "adress1",
+				Required:    true,
+			},
+			discord.ApplicationCommandOptionInt{
+				Name:        "depth",
+				Description: "adress2",
+				Required:    true,
+			},
+		},
+	},
+	discord.SlashCommandCreate{
+		Name:        "filter",
+		Description: "auto play",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionString{
+				Name:        "filter",
+				Description: "The queue type",
+				Required:    true,
+				Choices: []discord.ApplicationCommandOptionChoiceString{
+					{
+						Name:  "Karaoke",
+						Value: "karaoke",
+					},
+					{
+						Name:  "8d",
+						Value: "8d",
+					},
+					{
+						Name:  "Smoothing",
+						Value: "smoothing",
+					},
+					{
+						Name:  "Nightcore",
+						Value: "nightcore",
+					},
+
+					{
+						Name:  "LoveNightcore",
+						Value: "lovenightcore",
+					},
+					{
+						Name:  "Superfast",
+						Value: "superfast",
+					},
+
+					{
+						Name:  "Reset",
+						Value: "reset",
+					},
+				},
+			},
+		},
+	}, discord.SlashCommandCreate{
+		Name:        "equalizer",
+		Description: "equalizer",
+		Options: []discord.ApplicationCommandOption{
+			discord.ApplicationCommandOptionString{
+				Name:        "type",
+				Description: "The queue type",
+				Required:    true,
+				Choices: []discord.ApplicationCommandOptionChoiceString{
+					{
+						Name:  "radio",
+						Value: "radio",
+					},
+					{
+						Name:  "electronic",
+						Value: "electronic",
+					},
+					{
+						Name:  "gaming",
+						Value: "gaming",
+					},
+					{
+						Name:  "classical",
+						Value: "classical",
+					},
+					{
+						Name:  "pop",
+						Value: "pop",
+					},
+					{
+						Name:  "rock",
+						Value: "rock",
+					}, {
+						Name:  "bassboost",
+						Value: "bassboost",
+					}, {
+						Name:  "bass",
+						Value: "bass",
+					}, {
+						Name:  "bassboosthigh",
+						Value: "bassboosthigh",
+					}, {
+						Name:  "highfull",
+						Value: "highfull",
+					}, {
+						Name:  "treblebass",
+						Value: "treblebass",
+					}, {
+						Name:  "clean",
+						Value: "clean",
+					}, {
+						Name:  "wtf",
+						Value: "wtf",
+					},
+				},
+			},
+		},
+	},
+	discord.SlashCommandCreate{
 		Name:        "help",
 		Description: "help",
 	},

@@ -88,6 +88,10 @@ func main() {
 		"bass-boost":  b.BassBoost,
 		"disconnect":  b.Disconnect,
 		"autoplay":    b.Autoplay,
+		"equalizer":   b.BassBoost,
+		"timescale":   b.Timescale,
+		"tremolo":     b.Tremolo,
+		"filter":      b.Filter,
 		"help":        b.Help,
 	}
 

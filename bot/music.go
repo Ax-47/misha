@@ -20,23 +20,6 @@ var (
 	urlPattern    = regexp.MustCompile("^https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]?")
 	searchPattern = regexp.MustCompile(`^(.{2})search:(.+)`)
 )
-var bassBoost = &lavalink.Equalizer{
-	0:  0.2,
-	1:  0.15,
-	2:  0.1,
-	3:  0.05,
-	4:  0.0,
-	5:  -0.05,
-	6:  -0.1,
-	7:  -0.1,
-	8:  -0.1,
-	9:  -0.1,
-	10: -0.1,
-	11: -0.1,
-	12: -0.1,
-	13: -0.1,
-	14: -0.1,
-}
 
 func (b *Bot) Shuffle(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
 	queue := b.Queues.Get(*event.GuildID())
@@ -123,39 +106,6 @@ func (b *Bot) Seek(event *events.ApplicationCommandInteractionCreate, data disco
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
 			embed.Seek(FormatPosition(finalPosition)),
-		},
-	})
-}
-
-func (b *Bot) BassBoost(event *events.ApplicationCommandInteractionCreate, data discord.SlashCommandInteractionData) error {
-	player := b.Lavalink.ExistingPlayer(*event.GuildID())
-	if player == nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorNotFoundPlayer(),
-			},
-		})
-	}
-
-	enabled := data.Bool("enabled")
-	filters := player.Filters()
-	if enabled {
-		filters.Equalizer = bassBoost
-	} else {
-		filters.Equalizer = nil
-	}
-
-	if err := player.Update(context.TODO(), lavalink.WithFilters(filters)); err != nil {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorOther(),
-			},
-		})
-	}
-
-	return event.CreateMessage(discord.MessageCreate{
-		Embeds: []discord.Embed{
-			embed.BassBoost(enabled),
 		},
 	})
 }
