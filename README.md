@@ -33,30 +33,28 @@
 
 ### Music
 
-| Commands    | Desription | How to use  |
-| ----------- | ---------- | ----------- |
-| play        |            |             |
-| pause       |            |             |
-| now-playing |            |             |
-| stop        |            |             |
-| players     |            |             |
-| queue       |            |             |
-| clear-queue |            |             |
-| loop        |            |             |
-| shuffle     |            |             |
-| seek        |            |             |
-| volume      |            |             |
-| skip        |            |             |
-| bass-boost  |            |             |
-| disconnect  |            |             |
-| autoplay    |            |             |
+| Commands    | Desription                                       | How to use |
+| ----------- | ------------------------------------------------ | ---------- |
+| play        | Plays a song                                     |            |
+| pause       | Pauses the current song                          |            |
+| now-playing | Shows the current playing song                   |            |
+| stop        | Stops the current song and stops the player      |            |
+| players     | Disconnects the player                           |            |
+| queue       | Shows the current queue                          |            |
+| clear-queue | clear queue                                      |            |
+| loop        | loop                                             |            |
+| shuffle     | Shuffles the current queue                       |            |
+| seek        | Seeks to a specific position in the current song |            |
+| volume      | Sets the volume of the player                    |            |
+| skip        | Skips the current song                           |            |
+| disconnect  | Disconnects the player                           |            |
+| autoplay    | add a next song                                  |            |
 
 ### Filter
 
-| Commands    | Desription | How to use  |
-| ----------- | ---------- | ----------- |
-| equalizer        |            |             |
-| timescale       |            |             |
-| tremolo |            |             |
-| filter        |            |             |
-
+| Commands  | Desription | How to use |
+| --------- | ---------- | ---------- |
+| equalizer |            |            |
+| timescale |            |            |
+| tremolo   |            |            |
+| filter    |            |            |
