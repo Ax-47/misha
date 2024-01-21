@@ -23,6 +23,14 @@
 
 ## Commands
 
+### Help
+
+```
+
+\help <language>
+
+```
+
 ### Music
 
 | Commands    | Desription | How to use  |
@@ -42,3 +50,13 @@
 | bass-boost  |            |             |
 | disconnect  |            |             |
 | autoplay    |            |             |
+
+### Filter
+
+| Commands    | Desription | How to use  |
+| ----------- | ---------- | ----------- |
+| equalizer        |            |             |
+| timescale       |            |             |
+| tremolo |            |             |
+| filter        |            |             |
+
