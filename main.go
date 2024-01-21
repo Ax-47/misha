@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 	"os/signal"
@@ -30,7 +31,8 @@ func init() {
 	}
 }
 func main() {
-	slog.Info("starting disgo example...")
+	fmt.Print("\033[32m")
+	slog.Info("starting 0x47/misha")
 	slog.Info("disgo version", slog.String("version", disgo.Version))
 	slog.Info("disgolink version: ", slog.String("version", disgolink.Version))
 

@@ -30,5 +30,5 @@ func HelpMusic() discord.Embed {
 
 func HelpComponent() discord.ActionRowComponent {
 
-	return discord.NewActionRow(discord.NewSuccessButton("🏠", "index"), discord.NewSuccessButton("⚙️", "setting"), discord.NewSuccessButton("🎵", "music"))
+	return discord.NewActionRow(discord.NewSuccessButton("🏠", "index"), discord.NewSuccessButton("🎵", "music"))
 }

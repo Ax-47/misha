@@ -18,8 +18,6 @@ func (b *Bot) ButtonsEvent(event *events.ComponentInteractionCreate) {
 		next(b, event)
 	case "index":
 		index(b, event)
-	case "setting":
-		setting(b, event)
 	case "music":
 		music(b, event)
 	}
@@ -93,15 +91,7 @@ func index(b *Bot, event *events.ComponentInteractionCreate) error {
 		Components: &[]discord.ContainerComponent{embed.HelpComponent()},
 	})
 }
-func setting(b *Bot, event *events.ComponentInteractionCreate) error {
 
-	return event.UpdateMessage(discord.MessageUpdate{
-		Embeds: &[]discord.Embed{
-			embed.HelpSetting(),
-		},
-		Components: &[]discord.ContainerComponent{embed.HelpComponent()},
-	})
-}
 func music(b *Bot, event *events.ComponentInteractionCreate) error {
 
 	return event.UpdateMessage(discord.MessageUpdate{
