@@ -374,7 +374,7 @@ func (b *Bot) Filter(event *events.ApplicationCommandInteractionCreate, data dis
 	}
 	filter := player.Filters()
 
-	f, ok := data.OptString("frequency")
+	f, ok := data.OptString("filter")
 	if !ok {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
