@@ -74,3 +74,22 @@ func ErrorItIsNotYours() discord.Embed {
 		Color:       0x0,
 	}
 }
+
+func ErrorTimeScale() discord.Embed {
+	return discord.Embed{
+		Title: "speed,pitch,rate ห้ามน้อยกว่า 0",
+		Color: 0x0,
+	}
+}
+func ErrorFrequency() discord.Embed {
+	return discord.Embed{
+		Title: "Frequency ห้ามน้อยกว่า 0",
+		Color: 0x0,
+	}
+}
+func ErrorDepth() discord.Embed {
+	return discord.Embed{
+		Title: "Depth ห้ามน้อยกว่า 0 หรือเกิน1",
+		Color: 0x0,
+	}
+}

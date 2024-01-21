@@ -228,7 +228,7 @@ func (b *Bot) BassBoost(event *events.ApplicationCommandInteractionCreate, data 
 
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
-			embed.ErrorOther(),
+			embed.Eq(bassboost),
 		},
 	})
 }
@@ -243,51 +243,25 @@ func (b *Bot) Timescale(event *events.ApplicationCommandInteractionCreate, data 
 	}
 	speed, ok := data.OptInt("speed")
 	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorNotFoundPlayer(),
-			},
-		})
+		speed = 1
 	}
 	pitch, ok := data.OptInt("pitch")
 	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorNotFoundPlayer(),
-			},
-		})
+		pitch = 1
 	}
 	rate, ok := data.OptInt("rate")
 	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorNotFoundPlayer(),
-			},
-		})
+		rate = 1
 	}
 	filter := player.Filters()
 	filter.Timescale = &lavalink.Timescale{}
 	filter.Timescale.Speed = float64(speed) * 0.1
-	if filter.Timescale.Speed <= 0 {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorOther(),
-			},
-		})
-	}
 	filter.Timescale.Pitch = float64(pitch) * 0.1
-	if filter.Timescale.Pitch <= 0 {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorOther(),
-			},
-		})
-	}
 	filter.Timescale.Rate = float64(rate) * 0.1
-	if filter.Timescale.Rate <= 0 {
+	if filter.Timescale.Speed <= 0 || filter.Timescale.Pitch <= 0 || filter.Timescale.Rate <= 0 {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
-				embed.ErrorOther(),
+				embed.ErrorTimeScale(),
 			},
 		})
 	}
@@ -300,7 +274,7 @@ func (b *Bot) Timescale(event *events.ApplicationCommandInteractionCreate, data 
 	}
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
-			embed.ErrorOther(),
+			embed.Timescale(speed, pitch, rate),
 		},
 	})
 }
@@ -316,36 +290,29 @@ func (b *Bot) Tremolo(event *events.ApplicationCommandInteractionCreate, data di
 
 	frequency, ok := data.OptInt("frequency")
 	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorNotFoundPlayer(),
-			},
-		})
+		frequency = int(player.Filters().Tremolo.Frequency * 10)
 	}
 	depth, ok := data.OptInt("depth")
 	if !ok {
-		return event.CreateMessage(discord.MessageCreate{
-			Embeds: []discord.Embed{
-				embed.ErrorNotFoundPlayer(),
-			},
-		})
+		depth = int(player.Filters().Tremolo.Depth * 10)
 	}
 	var t lavalink.Tremolo
 	filter := player.Filters()
 	filter.Tremolo = &lavalink.Tremolo{}
 	filter.Tremolo.Frequency = float32(frequency) * 0.1
+	filter.Tremolo.Depth = float32(depth) * 0.1
 	if t.Frequency < 0 {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
-				embed.ErrorOther(),
+				embed.ErrorFrequency(),
 			},
 		})
 	}
-	filter.Tremolo.Depth = float32(depth) * 0.1
+
 	if t.Depth < 0 || t.Depth >= 1 {
 		return event.CreateMessage(discord.MessageCreate{
 			Embeds: []discord.Embed{
-				embed.ErrorOther(),
+				embed.ErrorDepth(),
 			},
 		})
 	}
@@ -358,7 +325,7 @@ func (b *Bot) Tremolo(event *events.ApplicationCommandInteractionCreate, data di
 	}
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
-			embed.ErrorOther(),
+			embed.Tremolo(frequency, depth),
 		},
 	})
 }
@@ -428,7 +395,7 @@ func (b *Bot) Filter(event *events.ApplicationCommandInteractionCreate, data dis
 	}
 	return event.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
-			embed.ErrorOther(),
+			embed.Filter(f),
 		},
 	})
 }
