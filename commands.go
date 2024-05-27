@@ -7,7 +7,6 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/json"
-	"github.com/disgoorg/snowflake/v2"
 )
 
 var commands = []discord.ApplicationCommandCreate{
@@ -256,7 +255,8 @@ var commands = []discord.ApplicationCommandCreate{
 				},
 			},
 		},
-	}, discord.SlashCommandCreate{
+	},
+	discord.SlashCommandCreate{
 		Name:        "equalizer",
 		Description: "equalizer",
 		Options: []discord.ApplicationCommandOption{
@@ -288,25 +288,32 @@ var commands = []discord.ApplicationCommandCreate{
 					{
 						Name:  "rock",
 						Value: "rock",
-					}, {
+					},
+					{
 						Name:  "bassboost",
 						Value: "bassboost",
-					}, {
+					},
+					{
 						Name:  "bass",
 						Value: "bass",
-					}, {
+					},
+					{
 						Name:  "bassboosthigh",
 						Value: "bassboosthigh",
-					}, {
+					},
+					{
 						Name:  "highfull",
 						Value: "highfull",
-					}, {
+					},
+					{
 						Name:  "treblebass",
 						Value: "treblebass",
-					}, {
+					},
+					{
 						Name:  "clean",
 						Value: "clean",
-					}, {
+					},
+					{
 						Name:  "wtf",
 						Value: "wtf",
 					},
@@ -321,7 +328,7 @@ var commands = []discord.ApplicationCommandCreate{
 }
 
 func registerCommands(client bot.Client) {
-	if _, err := client.Rest().SetGuildCommands(client.ApplicationID(), snowflake.GetEnv("GUILD_ID"), commands); err != nil {
+	if _, err := client.Rest().SetGlobalCommands(client.ApplicationID(), commands); err != nil {
 		slog.Error("error while registering commands ", slog.Any("err", err))
 	}
 }
