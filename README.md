@@ -12,14 +12,18 @@
 
 ## How to run
 
-* install [docker](https://docs.docker.com/desktop/)
-* install [Lavalink](https://github.com/lavalink-devs/Lavalink/releases/download/4.0.0/Lavalink.jar)
-* install [Golang](https://go.dev/dl/go1.21.6.windows-386.msi) && [Java](https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.msi)
-* config .env
-* $ docker-compose up -d
-* $ .\a
-* $ go build
-* $ .\misha
+- install [docker](https://docs.docker.com/desktop/)
+- install [Lavalink](https://github.com/lavalink-devs/Lavalink/releases/download/4.0.0/Lavalink.jar)
+- install [Golang](https://go.dev/dl/go1.21.6.windows-386.msi) && [Java](https://download.oracle.com/java/21/latest/jdk-21_windows-x64_bin.msi)
+- config .env
+
+```fish
+docker-compose up -d # if u use windown.
+docker compose up -d # if u use supur advanced os like arch linux.
+.\a
+go build
+.\misha
+```
 
 ## Commands
 
